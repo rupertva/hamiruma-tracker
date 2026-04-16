@@ -387,6 +387,12 @@
       <span class="link-icon">📸</span> @hamiruma_
     </a>
     <div id="journey">
+      <div class="journey-row" style="margin-bottom:4px;">
+        <div class="journey-label">LOCAL TIME</div>
+        <div id="j-local-time" style="font-size:20px;font-weight:600;color:#e8eaf0;margin-top:3px;letter-spacing:0.04em;"></div>
+        <div id="j-tz-info" style="font-size:10px;color:#5b8aaa;margin-top:2px;letter-spacing:0.06em;"></div>
+      </div>
+      <hr class="divider" style="margin: 10px 0;" />
       <div class="journey-row">
         <div class="journey-label">NOW</div>
         <div class="journey-flag" id="j-cur-flag"></div>
@@ -837,10 +843,59 @@
       }
     }
 
+    // ─── Local time & UK offset ───────────────────────────────────
+
+    function getUKOffset() {
+      // BST: last Sunday of March 01:00 UTC → last Sunday of October 01:00 UTC
+      function lastSunday(year, month) {
+        const d = new Date(Date.UTC(year, month + 1, 0));
+        d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+        d.setUTCHours(1, 0, 0, 0);
+        return d;
+      }
+      const now = new Date();
+      const bstStart = lastSunday(now.getUTCFullYear(), 2);  // March
+      const bstEnd   = lastSunday(now.getUTCFullYear(), 9);  // October
+      return (now >= bstStart && now < bstEnd) ? 1 : 0;
+    }
+
+    function updateLocalTime() {
+      // Derive UTC offset from longitude (nearest 30-min zone)
+      const rawOffset  = vessel.lng / 15;
+      const utcOffset  = Math.round(rawOffset * 2) / 2;
+      const ukOffset   = getUKOffset();
+      const behindHrs  = ukOffset - utcOffset; // always positive sailing west
+
+      // Current local time at vessel position
+      const now       = new Date();
+      const utcMs     = now.getTime() + now.getTimezoneOffset() * 60_000;
+      const localTime = new Date(utcMs + utcOffset * 3_600_000);
+      const timeStr   = localTime.toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC',
+      });
+
+      // Format UTC offset label e.g. "UTC−9:30"
+      const sign     = utcOffset >= 0 ? '+' : '−';
+      const absOff   = Math.abs(utcOffset);
+      const offH     = Math.floor(absOff);
+      const offM     = (absOff % 1) * 60;
+      const offLabel = `UTC${sign}${offH}${offM ? ':' + String(offM).padStart(2,'0') : ''}`;
+
+      // Format difference e.g. "10½h" or "10h"
+      const diffH    = Math.floor(behindHrs);
+      const diffHalf = (behindHrs % 1) !== 0;
+      const diffLabel = `${diffH}${diffHalf ? '½' : ''}h behind UK`;
+
+      document.getElementById('j-local-time').textContent = timeStr;
+      document.getElementById('j-tz-info').textContent    = `${offLabel} · ${diffLabel}`;
+    }
+
     // ─── Boot ────────────────────────────────────────────────────
 
     updatePanel();
     populateJourney();
+    updateLocalTime();
+    setInterval(updateLocalTime, 60_000); // tick every minute
     setStatus(DATA_URL ? 'connecting' : 'stale');
 
     // Globe.gl loads async via the CDN script tag above.
