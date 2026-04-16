@@ -544,11 +544,11 @@
 
     function buildPastLabel(w) {
       const el = document.createElement('div');
-      el.style.cssText = 'pointer-events:none;text-align:center;transform:translate(-50%,6px);line-height:1.2;opacity:0.55;';
+      el.style.cssText = 'pointer-events:none;text-align:center;transform:translate(-50%,6px);line-height:1.2;';
       el.innerHTML = `
-        <div style="font-size:13px;">${w.flag}</div>
-        <div style="font-size:9px;color:rgba(200,200,200,0.8);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:2px;white-space:nowrap;">${w.name}</div>
-        <div style="font-size:8px;color:rgba(180,180,180,0.6);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:1px;">${w.date}</div>`;
+        <div style="font-size:13px;color:rgba(255,255,255,0.4);">${w.flag}</div>
+        <div style="font-size:9px;color:rgba(190,190,190,0.55);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:2px;white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,1),0 0 3px rgba(0,0,0,1);">${w.name}</div>
+        <div style="font-size:8px;color:rgba(160,160,160,0.45);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:1px;text-shadow:0 0 6px rgba(0,0,0,1),0 0 3px rgba(0,0,0,1);">${w.date}</div>`;
       return el;
     }
 
