@@ -80,7 +80,7 @@
     .day-num {
       font-size: 26px;
       font-weight: 700;
-      color: #f4a0b4;
+      color: #ff1a72;
       letter-spacing: 0.04em;
       line-height: 1;
     }
@@ -104,7 +104,7 @@
     .section-flag  { font-size: 20px; line-height: 1; margin-bottom: 3px; }
     .section-place { font-size: 14px; font-weight: 600; color: #e8eaf0; margin-bottom: 2px; }
     .section-country { font-size: 10px; color: #5b8aaa; }
-    .section-date  { font-size: 10px; color: #f4a0b4; letter-spacing: 0.06em; margin-top: 2px; }
+    .section-date  { font-size: 10px; color: #ff1a72; letter-spacing: 0.06em; margin-top: 2px; }
 
     .local-time-row {
       display: flex;
@@ -339,7 +339,7 @@
     .m-day-num {
       font-size: 18px;
       font-weight: 700;
-      color: #f4a0b4;
+      color: #ff1a72;
       line-height: 1;
       letter-spacing: 0.04em;
       text-align: right;
@@ -866,24 +866,24 @@
 
     function buildYachtIcon() {
       const el = document.createElement('div');
-      el.style.cssText = 'pointer-events:none; transform:translate(-50%,-80%); filter:drop-shadow(0 0 7px rgba(244,160,180,0.95)) drop-shadow(0 0 14px rgba(244,160,180,0.55));';
+      el.style.cssText = 'pointer-events:none; transform:translate(-50%,-80%); filter:drop-shadow(0 0 7px rgba(255,26,114,0.95)) drop-shadow(0 0 14px rgba(244,160,180,0.55));';
       el.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 44" width="52" height="60">
           <!-- Mast -->
-          <line x1="17" y1="2" x2="17" y2="27" stroke="#f4a0b4" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="17" y1="2" x2="17" y2="27" stroke="#ff1a72" stroke-width="1.8" stroke-linecap="round"/>
           <!-- Mainsail -->
-          <path d="M17,3 L17,26 L31,26 Z" fill="rgba(244,160,180,0.88)" stroke="#f4a0b4" stroke-width="0.8" stroke-linejoin="round"/>
+          <path d="M17,3 L17,26 L31,26 Z" fill="rgba(255,26,114,0.88)" stroke="#ff1a72" stroke-width="0.8" stroke-linejoin="round"/>
           <!-- Jib -->
-          <path d="M17,9 L17,26 L7,26 Z" fill="rgba(244,160,180,0.65)" stroke="#f4a0b4" stroke-width="0.6" stroke-linejoin="round"/>
+          <path d="M17,9 L17,26 L7,26 Z" fill="rgba(255,26,114,0.65)" stroke="#ff1a72" stroke-width="0.6" stroke-linejoin="round"/>
           <!-- Boom -->
-          <line x1="17" y1="26" x2="30" y2="28" stroke="#f4a0b4" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="17" y1="26" x2="30" y2="28" stroke="#ff1a72" stroke-width="1.2" stroke-linecap="round"/>
           <!-- Hull -->
-          <path d="M4,28 Q17,30 34,28 L31,33 Q17,35 5,32 Z" fill="#f4a0b4"/>
+          <path d="M4,28 Q17,30 34,28 L31,33 Q17,35 5,32 Z" fill="#ff1a72"/>
           <!-- Waterline shimmer -->
           <path d="M6,33 Q17,35 30,32" fill="none" stroke="rgba(150,210,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
           <!-- Keel -->
-          <line x1="17" y1="33" x2="15" y2="38" stroke="#f4a0b4" stroke-width="1.4" stroke-linecap="round"/>
-          <line x1="15" y1="38" x2="20" y2="38" stroke="#f4a0b4" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="17" y1="33" x2="15" y2="38" stroke="#ff1a72" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="15" y1="38" x2="20" y2="38" stroke="#ff1a72" stroke-width="1.4" stroke-linecap="round"/>
         </svg>`;
       return el;
     }
@@ -1049,7 +1049,7 @@
         })
         // ── Pulse ring ──
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
-        .ringColor(() => '#f4a0b466')
+        .ringColor(() => '#ff1a7266')
         .ringMaxRadius(3)
         .ringPropagationSpeed(1)
         .ringRepeatPeriod(1200)
@@ -1063,7 +1063,7 @@
         .pathPointLng(p => p[1])
         .pathColor(d => {
           if (d.style === 'upcoming') return ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)'];
-          return ['rgba(244,160,180,0.9)', 'rgba(244,160,180,0.1)'];  // GPS track
+          return ['rgba(255,26,114,0.9)', 'rgba(255,26,114,0.1)'];  // GPS track
         })
         .pathStroke(d => d.style === 'gps' ? 1.4 : 0.7)
         .pathDashLength(d => d.style === 'upcoming' ? 0.025 : 0)
