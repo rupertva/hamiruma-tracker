@@ -407,27 +407,33 @@
       font-family: inherit;
     }
 
-    #m-next-btn {
-      display: block;
-      margin-top: 9px;
-      background: rgba(100, 180, 255, 0.08);
-      border: 1px solid rgba(100, 180, 255, 0.2);
-      border-radius: 6px;
-      padding: 5px 12px;
+    .m-btn-row {
+      display: flex;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    #m-next-btn, #m-info-btn {
+      flex: 1;
+      background: rgba(100, 180, 255, 0.07);
+      border: 1px solid rgba(100, 180, 255, 0.18);
+      border-radius: 7px;
+      padding: 7px 6px;
       color: #6aabcc;
       font-family: inherit;
       font-size: 11px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
       cursor: pointer;
+      text-align: center;
       transition: background 0.15s;
     }
 
-    #m-next-btn:active { background: rgba(100,180,255,0.18); }
+    #m-next-btn:active, #m-info-btn:active { background: rgba(100,180,255,0.18); }
 
     /* ── Mobile layout ──────────────────────────────────────── */
     @media (max-width: 600px) {
-      /* Desktop panels hidden on mobile */
-      #left-panel, #right-panel, #info-strip { display: none; }
+      /* Desktop panels + standalone mobile-btn hidden — buttons are inside the panel */
+      #left-panel, #right-panel, #info-strip, #mobile-btn { display: none; }
 
       /* Mobile-specific panels shown */
       #m-header {
@@ -648,7 +654,10 @@
         <div class="local-time-lbl">Local</div>
       </div>
       <div class="tz-info" id="m-j-tz-info"></div>
-      <button id="m-next-btn" onclick="toggleNextPopup()">Next stop ›</button>
+      <div class="m-btn-row">
+        <button id="m-next-btn" onclick="toggleNextPopup()">Next stop ›</button>
+        <button id="m-info-btn" onclick="toggleMobileDrawer()">More info 🤓</button>
+      </div>
     </div>
   </div>
 
@@ -947,10 +956,8 @@
     function toggleMobileDrawer() {
       const drawer   = document.getElementById('mobile-drawer');
       const backdrop = document.getElementById('mobile-backdrop');
-      const btn      = document.getElementById('mobile-btn');
       const isOpen   = drawer.classList.toggle('open');
       backdrop.classList.toggle('open', isOpen);
-      btn.style.display = isOpen ? 'none' : '';
     }
 
     async function fetchPosition() {
