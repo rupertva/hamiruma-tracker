@@ -572,14 +572,13 @@
         .labelsData([
           ...RALLY_ROUTE.map(w => ({
             lat: w.lat, lng: w.lng,
-            text: `${w.name}  ${w.date}`,
-            color: w.done ? '#7aaabb' : '#334455',
-            size: 0.7,
+            text: w.done ? w.name : `${w.name}  ${w.date}`,
+            color: w.done ? 'rgba(255,255,255,0.25)' : 'rgba(200,220,240,0.85)',
+            size: w.done ? 0.55 : 0.7,
           })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
         .pathsData([
-          { coords: rallyCoords(w => w.done),  style: 'done'     },
           { coords: rallyCoords(w => !w.done), style: 'upcoming' },
           { coords: buildGpsTrack(),           style: 'gps'      },
         ]);
@@ -694,11 +693,11 @@
         .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-        // ── Waypoint dots (no current-position dot — replaced by yacht icon) ──
+        // ── Waypoint dots: dim for visited, bright for upcoming ──
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
-        .pointColor(d => d.done ? '#4488aa' : '#223344')
+        .pointColor(d => d.done ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.75)')
         .pointAltitude(0.005)
-        .pointRadius(0.35)
+        .pointRadius(d => d.done ? 0.2 : 0.4)
         // ── Yacht icon at current position ──
         .htmlElementsData([{ lat: vessel.lat, lng: vessel.lng }])
         .htmlElement(() => buildYachtIcon())
@@ -708,9 +707,8 @@
         .ringMaxRadius(3)
         .ringPropagationSpeed(1)
         .ringRepeatPeriod(1200)
-        // ── Three paths: completed rally legs, upcoming rally legs, GPS track ──
+        // ── Two paths: upcoming rally legs (dashed) + actual GPS track (gold) ──
         .pathsData([
-          { coords: rallyCoords(w => w.done),  style: 'done'     },
           { coords: rallyCoords(w => !w.done), style: 'upcoming' },
           { coords: buildGpsTrack(),           style: 'gps'      },
         ])
@@ -718,21 +716,20 @@
         .pathPointLat(p => p[0])
         .pathPointLng(p => p[1])
         .pathColor(d => {
-          if (d.style === 'done')     return ['rgba(100,180,220,0.7)', 'rgba(100,180,220,0.3)'];
-          if (d.style === 'upcoming') return ['rgba(50,80,110,0.5)',   'rgba(50,80,110,0.2)' ];
+          if (d.style === 'upcoming') return ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)'];
           return ['rgba(255,215,0,0.9)', 'rgba(255,215,0,0.1)'];  // GPS track
         })
-        .pathStroke(d => d.style === 'gps' ? 1.4 : 0.8)
-        .pathDashLength(d => d.style === 'upcoming' ? 0.03 : 0)
-        .pathDashGap(d => d.style === 'upcoming' ? 0.01 : 0)
+        .pathStroke(d => d.style === 'gps' ? 1.4 : 0.7)
+        .pathDashLength(d => d.style === 'upcoming' ? 0.025 : 0)
+        .pathDashGap(d => d.style === 'upcoming' ? 0.012 : 0)
         .pathDashAnimateTime(d => d.style === 'gps' ? 10000 : 0)
         // ── Labels ──
         .labelsData([
           ...RALLY_ROUTE.map(w => ({
             lat: w.lat, lng: w.lng,
-            text: `${w.name}  ${w.date}`,
-            color: w.done ? '#7aaabb' : '#334455',
-            size: 0.7,
+            text: w.done ? w.name : `${w.name}  ${w.date}`,
+            color: w.done ? 'rgba(255,255,255,0.25)' : 'rgba(200,220,240,0.85)',
+            size: w.done ? 0.55 : 0.7,
           })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
