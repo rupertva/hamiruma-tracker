@@ -379,7 +379,7 @@
     #m-current {
       background: rgba(4, 9, 18, 0.96);
       border-top: 1px solid rgba(100, 180, 255, 0.2);
-      padding: 14px 20px 28px;
+      padding: 10px 16px 20px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -417,17 +417,17 @@
     }
 
     #m-next-btn, #m-info-btn {
-      flex: 1;
       background: rgba(100, 180, 255, 0.07);
       border: 1px solid rgba(100, 180, 255, 0.18);
       border-radius: 7px;
-      padding: 7px 6px;
+      padding: 6px 10px;
       color: #6aabcc;
       font-family: inherit;
-      font-size: 11px;
-      letter-spacing: 0.07em;
+      font-size: 10px;
+      letter-spacing: 0.06em;
       cursor: pointer;
       text-align: center;
+      white-space: nowrap;
       transition: background 0.15s;
     }
 
@@ -624,18 +624,24 @@
     </div>
 
     <div id="m-current">
-      <div class="m-section-hd">Current Location</div>
-      <div class="section-flag" id="m-j-cur-flag"></div>
-      <div class="section-place" id="m-j-cur-place"></div>
-      <div class="section-country" id="m-j-cur-country"></div>
-      <div class="local-time-row">
-        <div class="local-time-val" id="m-j-local-time"></div>
-        <div class="local-time-lbl">Local</div>
-      </div>
-      <div class="tz-info" id="m-j-tz-info"></div>
-      <div class="m-btn-row">
-        <button id="m-next-btn" onclick="toggleNextPopup()">Next stop ›</button>
-        <button id="m-info-btn" onclick="toggleMobileDrawer()">More info 🤓</button>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div style="flex:1;min-width:0;">
+          <div class="m-section-hd">Current Location</div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span class="section-flag" id="m-j-cur-flag" style="font-size:14px;line-height:1;"></span>
+            <span class="section-place" id="m-j-cur-place" style="font-size:13px;"></span>
+          </div>
+          <div class="section-country" id="m-j-cur-country" style="margin-top:2px;"></div>
+          <div class="local-time-row" style="margin-top:5px;">
+            <div class="local-time-val" id="m-j-local-time" style="font-size:15px;"></div>
+            <div class="local-time-lbl">Local</div>
+          </div>
+          <div class="tz-info" id="m-j-tz-info"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;padding-top:14px;">
+          <button id="m-next-btn" onclick="toggleNextPopup()">Next stop ›</button>
+          <button id="m-info-btn" onclick="toggleMobileDrawer()">More info 🤓</button>
+        </div>
       </div>
     </div>
   </div>
