@@ -80,7 +80,7 @@
     .day-num {
       font-size: 26px;
       font-weight: 700;
-      color: #ffd700;
+      color: #f4a0b4;
       letter-spacing: 0.04em;
       line-height: 1;
     }
@@ -104,7 +104,7 @@
     .section-flag  { font-size: 20px; line-height: 1; margin-bottom: 3px; }
     .section-place { font-size: 14px; font-weight: 600; color: #e8eaf0; margin-bottom: 2px; }
     .section-country { font-size: 10px; color: #5b8aaa; }
-    .section-date  { font-size: 10px; color: #ffd700; letter-spacing: 0.06em; margin-top: 2px; }
+    .section-date  { font-size: 10px; color: #f4a0b4; letter-spacing: 0.06em; margin-top: 2px; }
 
     .local-time-row {
       display: flex;
@@ -339,7 +339,7 @@
     .m-day-num {
       font-size: 18px;
       font-weight: 700;
-      color: #ffd700;
+      color: #f4a0b4;
       line-height: 1;
       letter-spacing: 0.04em;
       text-align: right;
@@ -899,7 +899,7 @@
         ])
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .labelsData([
-          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
+          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#f4a0b4', size: 1.5 },
         ])
         .pathsData([
           { coords: rallyCoords(w => !w.done), style: 'upcoming' },
@@ -1051,7 +1051,7 @@
         })
         // ── Pulse ring ──
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
-        .ringColor(() => '#ffd70066')
+        .ringColor(() => '#f4a0b466')
         .ringMaxRadius(3)
         .ringPropagationSpeed(1)
         .ringRepeatPeriod(1200)
@@ -1065,7 +1065,7 @@
         .pathPointLng(p => p[1])
         .pathColor(d => {
           if (d.style === 'upcoming') return ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)'];
-          return ['rgba(255,215,0,0.9)', 'rgba(255,215,0,0.1)'];  // GPS track
+          return ['rgba(244,160,180,0.9)', 'rgba(244,160,180,0.1)'];  // GPS track
         })
         .pathStroke(d => d.style === 'gps' ? 1.4 : 0.7)
         .pathDashLength(d => d.style === 'upcoming' ? 0.025 : 0)
@@ -1073,7 +1073,7 @@
         .pathDashAnimateTime(d => d.style === 'gps' ? 10000 : 0)
         // ── Labels ──
         .labelsData([
-          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
+          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#f4a0b4', size: 1.5 },
         ])
         .labelText('text')
         .labelColor(d => d.color)
