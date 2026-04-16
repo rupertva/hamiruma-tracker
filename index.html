@@ -807,10 +807,13 @@
         globe.width(window.innerWidth).height(window.innerHeight);
       });
 
-      // Boost scene lighting for a brighter, more vibrant globe
+      // Match Artemis II tracker lighting: directional 2.5, ambient 0.4 (dark blue tint)
       globe.scene().traverse(obj => {
-        if (obj.isAmbientLight)     obj.intensity *= 44.8;
-        if (obj.isDirectionalLight) obj.intensity *= 24.0;
+        if (obj.isAmbientLight) {
+          obj.intensity = 0.4;
+          obj.color.setHex(0x1a1a3a);
+        }
+        if (obj.isDirectionalLight) obj.intensity = 2.5;
       });
 
       // Day/night overlay
