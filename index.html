@@ -541,6 +541,21 @@
       return RALLY_ROUTE.filter(filterFn).map(w => [w.lat, w.lng]);
     }
 
+    function buildWaypointLabel(w) {
+      const el = document.createElement('div');
+      el.style.cssText = [
+        'pointer-events:none',
+        'text-align:center',
+        'transform:translate(-50%, 6px)',
+        'line-height:1.2',
+      ].join(';');
+      el.innerHTML = `
+        <div style="font-size:15px;">${w.flag}</div>
+        <div style="font-size:10px;color:rgba(200,225,245,0.9);font-family:'SF Mono',monospace;letter-spacing:0.05em;margin-top:2px;white-space:nowrap;">${w.name}</div>
+        <div style="font-size:9px;color:rgba(255,215,0,0.75);font-family:'SF Mono',monospace;letter-spacing:0.06em;margin-top:1px;">${w.date}</div>`;
+      return el;
+    }
+
     function buildYachtIcon() {
       const el = document.createElement('div');
       el.style.cssText = 'pointer-events:none; transform:translate(-50%,-80%); filter:drop-shadow(0 0 5px rgba(255,215,0,0.9)) drop-shadow(0 0 10px rgba(255,215,0,0.5));';
@@ -569,14 +584,17 @@
       if (!globe) return;
       globe
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
-        .htmlElementsData([{ lat: vessel.lat, lng: vessel.lng }])
+        .htmlElementsData([
+          { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
+          ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
+        ])
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .labelsData([
-          ...RALLY_ROUTE.map(w => ({
+          ...RALLY_ROUTE.filter(w => w.done).map(w => ({
             lat: w.lat, lng: w.lng,
-            text: w.done ? w.name : `${w.name}  ${w.date}`,
-            color: w.done ? 'rgba(255,255,255,0.25)' : 'rgba(200,220,240,0.85)',
-            size: w.done ? 0.55 : 0.7,
+            text: w.name,
+            color: 'rgba(255,255,255,0.25)',
+            size: 0.55,
           })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
@@ -700,9 +718,12 @@
         .pointColor(d => d.done ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.75)')
         .pointAltitude(0.005)
         .pointRadius(d => d.done ? 0.2 : 0.4)
-        // ── Yacht icon at current position ──
-        .htmlElementsData([{ lat: vessel.lat, lng: vessel.lng }])
-        .htmlElement(() => buildYachtIcon())
+        // ── Yacht icon + upcoming waypoint labels (HTML so emoji + multiline work) ──
+        .htmlElementsData([
+          { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
+          ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
+        ])
+        .htmlElement(d => d.type === 'yacht' ? buildYachtIcon() : buildWaypointLabel(d))
         // ── Pulse ring ──
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .ringColor(() => '#ffd70066')
@@ -727,11 +748,11 @@
         .pathDashAnimateTime(d => d.style === 'gps' ? 10000 : 0)
         // ── Labels ──
         .labelsData([
-          ...RALLY_ROUTE.map(w => ({
+          ...RALLY_ROUTE.filter(w => w.done).map(w => ({
             lat: w.lat, lng: w.lng,
-            text: w.done ? w.name : `${w.name}  ${w.date}`,
-            color: w.done ? 'rgba(255,255,255,0.25)' : 'rgba(200,220,240,0.85)',
-            size: w.done ? 0.55 : 0.7,
+            text: w.name,
+            color: 'rgba(255,255,255,0.25)',
+            size: 0.55,
           })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
