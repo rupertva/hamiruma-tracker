@@ -557,7 +557,7 @@
       el.style.cssText = [
         'pointer-events:none',
         'text-align:center',
-        'transform:translate(-50%, 6px)',
+        'transform:translate(-50%, 10px)',
         'line-height:1.2',
       ].join(';');
       el.innerHTML = `
@@ -721,9 +721,9 @@
         .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
         // ── Waypoint dots: dim for visited, bright for upcoming ──
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
-        .pointColor(d => d.done ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.75)')
+        .pointColor(d => d.done ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)')
         .pointAltitude(0.005)
-        .pointRadius(d => d.done ? 0.2 : 0.4)
+        .pointRadius(d => d.done ? 0.15 : 0.18)
         // ── Yacht icon + upcoming waypoint labels (HTML so emoji + multiline work) ──
         .htmlElementsData([
           { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
