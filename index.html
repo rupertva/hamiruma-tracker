@@ -867,9 +867,9 @@
       const behindHrs  = ukOffset - utcOffset; // always positive sailing west
 
       // Current local time at vessel position
+      // now.getTime() is already UTC ms — no timezone adjustment needed
       const now       = new Date();
-      const utcMs     = now.getTime() + now.getTimezoneOffset() * 60_000;
-      const localTime = new Date(utcMs + utcOffset * 3_600_000);
+      const localTime = new Date(now.getTime() + utcOffset * 3_600_000);
       const timeStr   = localTime.toLocaleTimeString('en-GB', {
         hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC',
       });
