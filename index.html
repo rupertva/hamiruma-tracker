@@ -240,6 +240,53 @@
       margin-top: 4px;
     }
 
+    /* ── Day counter (top-left) ─────────────────────────────── */
+    #day-counter {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      z-index: 10;
+      background: rgba(5, 10, 20, 0.82);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px 22px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    #day-counter .day-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: #4a7090;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    #day-counter .day-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffd700;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    #day-counter .day-total {
+      font-size: 12px;
+      color: #5b8aaa;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 600px) {
+      #day-counter {
+        top: 16px;
+        left: 16px;
+        padding: 10px 14px;
+      }
+      #day-counter .day-number { font-size: 22px; }
+      #day-counter .day-total  { font-size: 10px; }
+    }
+
     /* ── Loading overlay ────────────────────────────────────── */
     #loading {
       position: fixed;
@@ -338,6 +385,13 @@
   </div>
 
   <div id="globe-container"></div>
+
+  <!-- Day counter (top-left) -->
+  <div id="day-counter">
+    <div class="day-label">World Rally 2026/27</div>
+    <div class="day-number"><span id="day-x">–</span></div>
+    <div class="day-total" id="day-of-total"></div>
+  </div>
 
   <!-- Info Panel -->
   <div id="panel">
@@ -861,6 +915,18 @@
       return (now >= bstStart && now < bstEnd) ? 1 : 0;
     }
 
+    function updateDayCounter() {
+      const RALLY_START = new Date('2026-01-16T00:00:00Z');
+      const RALLY_END   = new Date('2027-04-01T00:00:00Z');
+      const totalDays   = Math.round((RALLY_END - RALLY_START) / 86_400_000) + 1; // 441
+
+      const now         = new Date();
+      const dayNum      = Math.max(1, Math.floor((now - RALLY_START) / 86_400_000) + 1);
+
+      document.getElementById('day-x').textContent       = 'Day ' + Math.min(dayNum, totalDays);
+      document.getElementById('day-of-total').textContent = 'of ' + totalDays + ' · Oyster World Rally';
+    }
+
     function updateLocalTime() {
       // Derive UTC offset from longitude (nearest 30-min zone)
       const rawOffset  = vessel.lng / 15;
@@ -897,7 +963,9 @@
     updatePanel();
     populateJourney();
     updateLocalTime();
-    setInterval(updateLocalTime, 60_000); // tick every minute
+    updateDayCounter();
+    setInterval(updateLocalTime, 60_000);   // tick every minute
+    setInterval(updateDayCounter, 60_000);  // tick every minute
     setStatus(DATA_URL ? 'connecting' : 'stale');
 
     // Globe.gl loads async via the CDN script tag above.
