@@ -673,7 +673,7 @@
       if (!nightSunUniform) return;
       const { lat, lng } = getSunPosition();
       const phi   = (90 - lat) * Math.PI / 180;
-      const theta = lng        * Math.PI / 180;
+      const theta = (90 - lng) * Math.PI / 180;
       nightSunUniform.value.set(
         Math.sin(phi) * Math.cos(theta),
         Math.cos(phi),
