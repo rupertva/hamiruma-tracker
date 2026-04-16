@@ -310,13 +310,17 @@
       background: rgba(5, 10, 20, 0.88);
       border: 1px solid rgba(100, 180, 255, 0.2);
       border-radius: 10px;
-      padding: 12px 16px 14px;
+      padding: 10px 14px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
 
     .m-name {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 0.12em;
       color: #ffffff;
@@ -325,27 +329,28 @@
     }
 
     .m-sub {
-      font-size: 9px;
-      letter-spacing: 0.16em;
+      font-size: 8px;
+      letter-spacing: 0.14em;
       color: #4a7090;
       text-transform: uppercase;
       margin-top: 3px;
     }
 
     .m-day-num {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 700;
       color: #ffd700;
       line-height: 1;
       letter-spacing: 0.04em;
-      margin-top: 10px;
+      text-align: right;
     }
 
     .m-day-sub {
-      font-size: 10px;
+      font-size: 9px;
       color: #5b8aaa;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       margin-top: 2px;
+      text-align: right;
     }
 
     /* ── Mobile bottom column: current + next popup ──────────── */
@@ -595,10 +600,14 @@
 
   <!-- Mobile compact header (top) -->
   <div id="m-header">
-    <div class="m-name">Hamiruma</div>
-    <div class="m-sub">Oyster World Rally 2026/27</div>
-    <div class="m-day-num"><span id="m-day-x">–</span></div>
-    <div class="m-day-sub" id="m-day-of-total"></div>
+    <div>
+      <div class="m-name">Hamiruma</div>
+      <div class="m-sub">Oyster World Rally 2026/27</div>
+    </div>
+    <div>
+      <div class="m-day-num" id="m-day-x">–</div>
+      <div class="m-day-sub" id="m-day-of-total"></div>
+    </div>
   </div>
 
   <!-- Mobile bottom: current location + next popup -->
@@ -1165,9 +1174,9 @@
       const dayNum      = Math.max(1, Math.floor((now - RALLY_START) / 86_400_000) + 1);
 
       const dayStr = 'Day ' + Math.min(dayNum, totalDays);
-      const subStr = 'of ' + totalDays + ' · Oyster World Rally';
       setText('day-x',        dayStr); setText('m-day-x',        dayStr);
-      setText('day-of-total', subStr); setText('m-day-of-total', subStr);
+      setText('day-of-total', 'of ' + totalDays + ' · Oyster World Rally');
+      setText('m-day-of-total', 'of ' + totalDays);
     }
 
     function updateLocalTime() {
