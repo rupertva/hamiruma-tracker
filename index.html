@@ -265,6 +265,59 @@
       0%, 100% { transform: rotate(-5deg); }
       50% { transform: rotate(5deg); }
     }
+
+    /* ── Mobile layout ──────────────────────────────────────── */
+    @media (max-width: 600px) {
+      /* Panel: full width at top */
+      #panel {
+        top: 16px;
+        left: 16px;
+        right: 16px;
+        width: auto;
+        padding: 16px 18px;
+      }
+
+      #panel .vessel-name    { font-size: 18px; }
+      #panel .vessel-subtitle { margin-bottom: 12px; }
+      .stat-row  { margin-bottom: 7px; }
+      .divider   { margin: 10px 0; }
+      #status-row { margin-top: 10px; }
+
+      /* Bottom row: Instagram link + journey side by side */
+      #left-bottom {
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        flex-direction: row;
+        align-items: flex-end;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+
+      .insta-link {
+        font-size: 11px;
+        padding: 8px 10px;
+        flex-shrink: 0;
+      }
+
+      #journey {
+        flex: 1;
+        padding: 12px 14px;
+        width: auto;
+        display: flex;
+        gap: 12px;
+      }
+
+      #journey .journey-row { flex: 1; min-width: 0; }
+      #journey .journey-flag { font-size: 20px; margin-bottom: 4px; }
+      #journey .journey-place { font-size: 12px; }
+      #journey .journey-country { font-size: 10px; }
+      #journey .journey-date { font-size: 10px; }
+      #journey hr.divider { display: none; }
+
+      /* Hide tracker links on mobile — available via panel */
+      #links { display: none; }
+    }
   </style>
 </head>
 <body>
