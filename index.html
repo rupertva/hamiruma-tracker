@@ -301,6 +301,9 @@
       50% { transform: rotate(5deg); }
     }
 
+    /* ── Mobile button + drawer (hidden on desktop) ─────────── */
+    #mobile-btn, #mobile-drawer, #mobile-backdrop { display: none; }
+
     /* ── Mobile layout ──────────────────────────────────────── */
     @media (max-width: 600px) {
       #left-panel {
@@ -314,13 +317,86 @@
       .logo-text { font-size: 18px; }
       .day-num   { font-size: 21px; }
 
-      #right-panel { display: none; }
+      /* Hidden on mobile — content lives in the drawer instead */
+      #right-panel, #info-strip { display: none; }
 
-      #info-strip {
-        bottom: 16px;
-        right: 16px;
-        left: 16px;
-        min-width: 0;
+      /* ── More info button ─────────────────────────────────── */
+      #mobile-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        position: fixed;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        background: rgba(5, 10, 20, 0.88);
+        border: 1px solid rgba(100, 180, 255, 0.28);
+        border-radius: 22px;
+        padding: 10px 22px;
+        color: #7aaccf;
+        font-family: inherit;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        white-space: nowrap;
+        transition: border-color 0.2s, color 0.2s;
+      }
+
+      #mobile-btn:active {
+        border-color: rgba(100, 180, 255, 0.55);
+        color: #b0d8f0;
+      }
+
+      /* ── Tap-outside backdrop ─────────────────────────────── */
+      #mobile-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 17;
+      }
+
+      #mobile-backdrop.open { display: block; }
+
+      /* ── Slide-up drawer ──────────────────────────────────── */
+      #mobile-drawer {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 18;
+        background: rgba(4, 9, 18, 0.97);
+        border-top: 1px solid rgba(100, 180, 255, 0.2);
+        border-radius: 16px 16px 0 0;
+        padding: 12px 20px 36px;
+        transform: translateY(105%);
+        transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      #mobile-drawer.open { transform: translateY(0); }
+
+      .drawer-handle {
+        width: 36px;
+        height: 3px;
+        background: rgba(100, 180, 255, 0.2);
+        border-radius: 2px;
+        margin: 0 auto 16px;
+      }
+
+      .drawer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      #mobile-drawer .insta-link,
+      #mobile-drawer .tracker-link {
+        width: 100%;
+        justify-content: flex-start;
       }
     }
   </style>
@@ -417,6 +493,58 @@
     <div id="status-row">
       <div id="status-dot"></div>
       <div id="status-text">connecting…</div>
+    </div>
+  </div>
+
+  <!-- Mobile: "More info" button + slide-up drawer -->
+  <button id="mobile-btn" onclick="toggleMobileDrawer()">More info 🤓</button>
+  <div id="mobile-backdrop" onclick="toggleMobileDrawer()"></div>
+
+  <div id="mobile-drawer">
+    <div class="drawer-handle"></div>
+
+    <div class="drawer-links">
+      <a class="insta-link" href="https://www.instagram.com/hamiruma_/" target="_blank" rel="noopener">
+        <img style="width:17px;height:17px;border-radius:50%;display:block;flex-shrink:0;filter:invert(1) opacity(0.65);" src="./instagram.png" alt="Instagram">
+        Follow along @hamiruma_
+      </a>
+      <a class="tracker-link" href="https://my.yb.tl/hamiruma" target="_blank" rel="noopener">
+        <img class="link-icon" src="https://www.google.com/s2/favicons?domain=yb.tl&sz=32" alt=""> YB Tracking
+      </a>
+      <a class="tracker-link" href="https://www.predictwind.com/tracking/Hamiruma" target="_blank" rel="noopener">
+        <img class="link-icon" src="https://www.google.com/s2/favicons?domain=predictwind.com&sz=32" alt=""> PredictWind
+      </a>
+      <a class="tracker-link" href="https://www.vesselfinder.com/vessels/details/232061381" target="_blank" rel="noopener">
+        <img class="link-icon" src="https://www.google.com/s2/favicons?domain=vesselfinder.com&sz=32" alt=""> VesselFinder
+      </a>
+    </div>
+
+    <hr class="divider" />
+
+    <div style="padding-top:10px;">
+      <div class="info-row">
+        <span class="info-lbl">Lat</span>
+        <span class="info-val hi" id="m-val-lat">–</span>
+        <span class="info-sep">·</span>
+        <span class="info-lbl">Lng</span>
+        <span class="info-val hi" id="m-val-lng">–</span>
+      </div>
+      <div class="info-row">
+        <span class="info-lbl">Spd</span>
+        <span class="info-val" id="m-val-speed">–</span>
+        <span class="info-sep">·</span>
+        <span class="info-lbl">Cog</span>
+        <span class="info-val" id="m-val-course">–</span>
+      </div>
+      <div class="info-row info-muted">
+        <span id="m-val-updated">–</span>
+        <span class="info-sep">·</span>
+        <span id="m-val-source">–</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+        <div id="m-status-dot" style="width:6px;height:6px;border-radius:50%;background:#ffa500;flex-shrink:0;"></div>
+        <div id="m-status-text" style="font-size:9px;color:#2e4e68;letter-spacing:0.1em;">connecting…</div>
+      </div>
     </div>
   </div>
 
@@ -534,13 +662,25 @@
       return `${d}° ${v >= 0 ? 'E' : 'W'}`;
     }
 
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
     function updatePanel() {
-      document.getElementById('val-lat').textContent     = formatLat(vessel.lat);
-      document.getElementById('val-lng').textContent     = formatLng(vessel.lng);
-      document.getElementById('val-speed').textContent   = vessel.sog != null ? `${Number(vessel.sog).toFixed(1)} kts` : '–';
-      document.getElementById('val-course').textContent  = vessel.cog != null ? `${Math.round(vessel.cog)}°` : '–';
-      document.getElementById('val-updated').textContent = vessel.updated ?? '–';
-      document.getElementById('val-source').textContent  = vessel.source  ?? '–';
+      const lat = formatLat(vessel.lat);
+      const lng = formatLng(vessel.lng);
+      const spd = vessel.sog != null ? `${Number(vessel.sog).toFixed(1)} kts` : '–';
+      const cog = vessel.cog != null ? `${Math.round(vessel.cog)}°` : '–';
+      const upd = vessel.updated ?? '–';
+      const src = vessel.source  ?? '–';
+      // Update both desktop strip and mobile drawer
+      setText('val-lat',     lat); setText('m-val-lat',     lat);
+      setText('val-lng',     lng); setText('m-val-lng',     lng);
+      setText('val-speed',   spd); setText('m-val-speed',   spd);
+      setText('val-course',  cog); setText('m-val-course',  cog);
+      setText('val-updated', upd); setText('m-val-updated', upd);
+      setText('val-source',  src); setText('m-val-source',  src);
     }
 
     function buildGpsTrack() {
@@ -624,20 +764,33 @@
     }
 
     function setStatus(state) {
-      const dot  = document.getElementById('status-dot');
-      const text = document.getElementById('status-text');
-      if (state === 'live') {
-        dot.className = 'live';
-        text.textContent = 'Live data';
-      } else if (state === 'stale') {
-        dot.className = '';
-        dot.style.background = '#ffa500';
-        text.textContent = 'Last known position';
-      } else {
-        dot.className = '';
-        dot.style.background = '#555';
-        text.textContent = 'No data source configured';
-      }
+      [['status-dot','status-text'], ['m-status-dot','m-status-text']].forEach(([dotId, textId]) => {
+        const dot  = document.getElementById(dotId);
+        const text = document.getElementById(textId);
+        if (!dot || !text) return;
+        if (state === 'live') {
+          dot.style.background = '#44dd88';
+          dot.style.boxShadow  = '0 0 5px #44dd88';
+          text.textContent     = 'Live data';
+        } else if (state === 'stale') {
+          dot.style.background = '#ffa500';
+          dot.style.boxShadow  = '';
+          text.textContent     = 'Last known position';
+        } else {
+          dot.style.background = '#555';
+          dot.style.boxShadow  = '';
+          text.textContent     = 'No data source configured';
+        }
+      });
+    }
+
+    function toggleMobileDrawer() {
+      const drawer   = document.getElementById('mobile-drawer');
+      const backdrop = document.getElementById('mobile-backdrop');
+      const btn      = document.getElementById('mobile-btn');
+      const isOpen   = drawer.classList.toggle('open');
+      backdrop.classList.toggle('open', isOpen);
+      btn.style.display = isOpen ? 'none' : '';
     }
 
     async function fetchPosition() {
