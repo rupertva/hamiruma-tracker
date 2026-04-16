@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hamiruma · Live Position Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #050a14;
+      color: #e8eaf0;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #globe-container {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* ── Info Panel ─────────────────────────────────────────── */
+    #panel {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      z-index: 10;
+      background: rgba(5, 10, 20, 0.82);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 12px;
+      padding: 24px 28px;
+      width: 280px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    #panel .vessel-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    #panel .vessel-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: #5b8aaa;
+      text-transform: uppercase;
+      margin-top: 3px;
+      margin-bottom: 20px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: #4a7090;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      color: #c8dff0;
+      font-weight: 500;
+    }
+
+    .stat-value.highlight {
+      color: #ffd700;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(100, 160, 220, 0.12);
+      margin: 16px 0;
+    }
+
+    #status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    #status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffa500;
+      flex-shrink: 0;
+    }
+
+    #status-dot.live {
+      background: #44dd88;
+      box-shadow: 0 0 6px #44dd88;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    #status-text {
+      font-size: 10px;
+      color: #4a7090;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Left bottom column (Instagram + journey) ───────────── */
+    #left-bottom {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .insta-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(5, 10, 20, 0.75);
+      border: 1px solid rgba(100, 180, 255, 0.15);
+      border-radius: 8px;
+      padding: 12px 18px;
+      text-decoration: none;
+      color: #6aabcc;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      transition: border-color 0.2s, color 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .insta-link:hover {
+      border-color: rgba(100, 180, 255, 0.45);
+      color: #b0d8f0;
+    }
+
+    .insta-link .link-icon { font-size: 17px; line-height: 1; }
+
+    /* ── Journey box ────────────────────────────────────────── */
+    #journey {
+      background: rgba(5, 10, 20, 0.82);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 12px;
+      padding: 20px 24px;
+      width: 230px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* ── Tracker links (right side, compact) ────────────────── */
+    #links {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .tracker-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(5, 10, 20, 0.6);
+      border: 1px solid rgba(100, 180, 255, 0.1);
+      border-radius: 6px;
+      padding: 7px 12px;
+      text-decoration: none;
+      color: #3d6a88;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      transition: border-color 0.2s, color 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .tracker-link:hover {
+      border-color: rgba(100, 180, 255, 0.35);
+      color: #7aaabb;
+    }
+
+    .tracker-link .link-icon { font-size: 13px; line-height: 1; }
+
+    .journey-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: #4a7090;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .journey-flag {
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .journey-place {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e8eaf0;
+      margin-bottom: 3px;
+    }
+
+    .journey-country {
+      font-size: 11px;
+      color: #5b8aaa;
+      letter-spacing: 0.06em;
+    }
+
+    .journey-date {
+      font-size: 11px;
+      color: #ffd700;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+
+    /* ── Loading overlay ────────────────────────────────────── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050a14;
+      flex-direction: column;
+      gap: 16px;
+      transition: opacity 0.8s ease;
+    }
+
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-text {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: #3a6080;
+      text-transform: uppercase;
+    }
+
+    .loading-boat {
+      font-size: 28px;
+      animation: sway 2s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="loading-boat">⛵</div>
+    <div class="loading-text">Loading globe…</div>
+  </div>
+
+  <div id="globe-container"></div>
+
+  <!-- Info Panel -->
+  <div id="panel">
+    <div class="vessel-name">Hamiruma</div>
+    <div class="vessel-subtitle">Sailing Vessel · MMSI 232061381</div>
+
+    <div class="stat-row">
+      <span class="stat-label">Latitude</span>
+      <span class="stat-value highlight" id="val-lat">–</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Longitude</span>
+      <span class="stat-value highlight" id="val-lng">–</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="stat-row">
+      <span class="stat-label">Speed</span>
+      <span class="stat-value" id="val-speed">–</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Course</span>
+      <span class="stat-value" id="val-course">–</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="stat-row">
+      <span class="stat-label">Last Updated</span>
+      <span class="stat-value" id="val-updated">–</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Source</span>
+      <span class="stat-value" id="val-source">–</span>
+    </div>
+
+    <div id="status-row">
+      <div id="status-dot"></div>
+      <div id="status-text">connecting…</div>
+    </div>
+  </div>
+
+  <!-- Left bottom: Instagram + journey box -->
+  <div id="left-bottom">
+    <a class="insta-link" href="https://www.instagram.com/hamiruma_/" target="_blank" rel="noopener">
+      <span class="link-icon">📸</span> @hamiruma_
+    </a>
+    <div id="journey">
+      <div class="journey-row">
+        <div class="journey-label">NOW</div>
+        <div class="journey-flag" id="j-cur-flag"></div>
+        <div class="journey-place" id="j-cur-place"></div>
+        <div class="journey-country" id="j-cur-country"></div>
+      </div>
+      <hr class="divider" style="margin: 12px 0;" />
+      <div class="journey-row">
+        <div class="journey-label">NEXT</div>
+        <div class="journey-flag" id="j-nxt-flag"></div>
+        <div class="journey-place" id="j-nxt-place"></div>
+        <div class="journey-country" id="j-nxt-country"></div>
+        <div class="journey-date" id="j-nxt-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right bottom: tracker links -->
+  <div id="links">
+    <a class="tracker-link" href="https://my.yb.tl/hamiruma" target="_blank" rel="noopener">
+      <span class="link-icon">📡</span> YB Tracking
+    </a>
+    <a class="tracker-link" href="https://www.predictwind.com/tracking/Hamiruma" target="_blank" rel="noopener">
+      <span class="link-icon">🌊</span> PredictWind
+    </a>
+    <a class="tracker-link" href="https://www.vesselfinder.com/vessels/details/232061381" target="_blank" rel="noopener">
+      <span class="link-icon">🔍</span> VesselFinder
+    </a>
+  </div>
+
+  <!-- globe.gl via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2/dist/globe.gl.min.js"></script>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────
+    //  DATA SOURCE — YB Tracking satellite API
+    //  Endpoint confirmed via DevTools on my.yb.tl/hamiruma
+    //  Response: { positions: [{at (ms), t (lat), g (lng), id}] }
+    //
+    const DATA_URL = 'https://app.yb.tl/APIX/Blog/GetPositions?keyword=hamiruma&event=16273';
+    const REFRESH_INTERVAL_MS = 5 * 60_000; // re-fetch every 5 minutes
+
+    // Last known position — used when live data is unavailable or on first load.
+    // Nuku Hiva, Marquesas — most recent YB satellite ping as of Apr 13 2026.
+    const LAST_KNOWN = {
+      lat:     -8.94502,
+      lng:     -140.16394,
+      sog:     null,
+      cog:     null,
+      updated: '13 Apr 2026 (YB satellite)',
+      source:  'YB Tracking',
+    };
+
+    // ── Oyster World Rally 2026/27 planned waypoints ──────────────
+    // done: true = leg completed (as of Apr 15 2026)
+    const RALLY_ROUTE = [
+      { lat:  17.1,  lng:  -61.8,  name: 'Antigua',              date: 'Jan 17',     done: true,  flag: '🇦🇬', country: 'Antigua & Barbuda'  },
+      { lat:   9.1,  lng:  -79.7,  name: 'Panama Canal',          date: 'Feb 12',     done: true,  flag: '🇵🇦', country: 'Panama'             },
+      { lat:  -0.7,  lng:  -90.3,  name: 'Galapagos Islands',     date: 'Mar 4',      done: true,  flag: '🇪🇨', country: 'Ecuador'            },
+      { lat:  -9.8,  lng: -139.0,  name: 'Hiva Oa, Marquesas',    date: 'Apr 4',      done: true,  flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat:  -8.9,  lng: -140.1,  name: 'Nuku Hiva, Marquesas',  date: 'Apr 11',     done: true,  flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -15.0,  lng: -145.5,  name: 'Tuamotus',              date: 'Apr 20',     done: false, flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -17.5,  lng: -149.6,  name: 'Tahiti',                date: 'May 1',      done: false, flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -16.7,  lng: -151.4,  name: 'Raiatea',               date: 'May 28',     done: false, flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -18.7,  lng: -174.0,  name: "Tonga (Vava'u)",        date: 'Jun 9',      done: false, flag: '🇹🇴', country: 'Tonga'              },
+      { lat: -16.8,  lng:  179.3,  name: 'Savusavu, Fiji',        date: 'Jun 19',     done: false, flag: '🇫🇯', country: 'Fiji'               },
+      { lat: -17.8,  lng:  177.4,  name: 'Nadi, Fiji',            date: 'Jul 4',      done: false, flag: '🇫🇯', country: 'Fiji'               },
+      { lat: -19.5,  lng:  169.3,  name: 'Tanna, Vanuatu',        date: 'Jul 26',     done: false, flag: '🇻🇺', country: 'Vanuatu'            },
+      { lat: -17.7,  lng:  168.3,  name: 'Port Vila, Vanuatu',    date: 'Aug 1',      done: false, flag: '🇻🇺', country: 'Vanuatu'            },
+      { lat: -21.1,  lng:  149.2,  name: 'Mackay, Australia',     date: 'Aug 11',     done: false, flag: '🇦🇺', country: 'Australia'          },
+      { lat: -16.9,  lng:  145.8,  name: 'Cairns, Australia',     date: 'Aug 28',     done: false, flag: '🇦🇺', country: 'Australia'          },
+      { lat: -12.5,  lng:  130.8,  name: 'Darwin, Australia',     date: 'Sep 14',     done: false, flag: '🇦🇺', country: 'Australia'          },
+      { lat:  -8.5,  lng:  115.2,  name: 'Indonesia',             date: 'Sep 21',     done: false, flag: '🇮🇩', country: 'Indonesia'          },
+      { lat: -12.2,  lng:   96.8,  name: 'Cocos (Keeling) Is.',   date: 'Oct 14',     done: false, flag: '🇨🇨', country: 'Cocos Islands (AU)' },
+      { lat: -20.2,  lng:   57.5,  name: 'Mauritius',             date: 'Oct 28',     done: false, flag: '🇲🇺', country: 'Mauritius'          },
+      { lat: -21.1,  lng:   55.5,  name: 'Réunion',               date: 'Nov 6',      done: false, flag: '🇫🇷', country: 'France (Réunion)'   },
+      { lat: -33.9,  lng:   18.4,  name: 'Cape Town',             date: 'Dec 1',      done: false, flag: '🇿🇦', country: 'South Africa'       },
+      { lat: -15.9,  lng:   -5.7,  name: 'St Helena',             date: 'Jan 2027',   done: false, flag: '🇸🇭', country: 'St Helena (UK)'     },
+      { lat:  -8.1,  lng:  -34.9,  name: 'Recife, Brazil',        date: 'Feb 2027',   done: false, flag: '🇧🇷', country: 'Brazil'             },
+      { lat:  -3.9,  lng:  -32.4,  name: 'Fernando de Noronha',   date: 'Feb 2027',   done: false, flag: '🇧🇷', country: 'Brazil'             },
+      { lat:  12.1,  lng:  -61.7,  name: 'Grenada',               date: 'Mar 2027',   done: false, flag: '🇬🇩', country: 'Grenada'            },
+      { lat:  17.1,  lng:  -61.8,  name: 'Antigua (Finish)',      date: 'Apr 1 2027', done: false, flag: '🇦🇬', country: 'Antigua & Barbuda'  },
+    ];
+
+    // Approximate actual GPS track Galapagos → Marquesas
+    const APPROX_TRACK = [
+      [-0.8,  -89.6],
+      [-2.2,  -96.5],
+      [-4.1, -104.8],
+      [-5.8, -112.5],
+      [-7.0, -120.2],
+      [-7.9, -127.4],
+      [-8.4, -133.0],
+      [-8.7, -136.8],
+      [-8.9, -140.1],
+    ];
+    // ─────────────────────────────────────────────────────────────
+
+    // Parse the YB API response.
+    // Response shape: { drawRanges: [...], positions: [{at, t, g, id}, ...] }
+    //   t  = latitude, g = longitude, at = Unix timestamp (milliseconds)
+    function parseResponse(json) {
+      const positions = json.positions;
+      if (!positions || positions.length === 0) throw new Error('No positions in YB response');
+
+      // Build the full GPS track for the globe
+      liveTrack = positions.map(p => [p.t, p.g]);
+
+      // Most recent position is the last entry
+      const last = positions[positions.length - 1];
+      const updatedDate = new Date(last.at);
+      const updatedStr  = updatedDate.toUTCString().replace(':00 GMT', ' UTC').replace(' 00:00', '');
+
+      return {
+        lat:     last.t,
+        lng:     last.g,
+        sog:     null,  // YB positions don't include SOG/COG
+        cog:     null,
+        updated: updatedStr,
+        source:  'YB Tracking (satellite)',
+      };
+    }
+
+    // ─────────────────────────────────────────────────────────────
+
+    let vessel = { ...LAST_KNOWN };
+    let globe;
+    let liveTrack = null; // populated from YB API positions array
+
+    function formatLat(v) {
+      if (v == null) return '–';
+      const d = Math.abs(v).toFixed(4);
+      return `${d}° ${v >= 0 ? 'N' : 'S'}`;
+    }
+
+    function formatLng(v) {
+      if (v == null) return '–';
+      const d = Math.abs(v).toFixed(4);
+      return `${d}° ${v >= 0 ? 'E' : 'W'}`;
+    }
+
+    function updatePanel() {
+      document.getElementById('val-lat').textContent     = formatLat(vessel.lat);
+      document.getElementById('val-lng').textContent     = formatLng(vessel.lng);
+      document.getElementById('val-speed').textContent   = vessel.sog != null ? `${Number(vessel.sog).toFixed(1)} kts` : '–';
+      document.getElementById('val-course').textContent  = vessel.cog != null ? `${Math.round(vessel.cog)}°` : '–';
+      document.getElementById('val-updated').textContent = vessel.updated ?? '–';
+      document.getElementById('val-source').textContent  = vessel.source  ?? '–';
+    }
+
+    function buildGpsTrack() {
+      // Use live track from YB API if available, otherwise fall back to approx route
+      if (liveTrack && liveTrack.length > 1) return liveTrack;
+      const pts = [...APPROX_TRACK];
+      pts[pts.length - 1] = [vessel.lat, vessel.lng];
+      return pts;
+    }
+
+    function rallyCoords(filterFn) {
+      return RALLY_ROUTE.filter(filterFn).map(w => [w.lat, w.lng]);
+    }
+
+    function buildYachtIcon() {
+      const el = document.createElement('div');
+      el.style.cssText = 'pointer-events:none; transform:translate(-50%,-80%); filter:drop-shadow(0 0 5px rgba(255,215,0,0.9)) drop-shadow(0 0 10px rgba(255,215,0,0.5));';
+      el.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 44" width="38" height="44">
+          <!-- Mast -->
+          <line x1="17" y1="2" x2="17" y2="27" stroke="#FFD700" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Mainsail -->
+          <path d="M17,3 L17,26 L31,26 Z" fill="rgba(255,220,60,0.88)" stroke="#FFD700" stroke-width="0.8" stroke-linejoin="round"/>
+          <!-- Jib -->
+          <path d="M17,9 L17,26 L7,26 Z" fill="rgba(255,220,60,0.65)" stroke="#FFD700" stroke-width="0.6" stroke-linejoin="round"/>
+          <!-- Boom -->
+          <line x1="17" y1="26" x2="30" y2="28" stroke="#FFD700" stroke-width="1.2" stroke-linecap="round"/>
+          <!-- Hull -->
+          <path d="M4,28 Q17,30 34,28 L31,33 Q17,35 5,32 Z" fill="#FFD700"/>
+          <!-- Waterline shimmer -->
+          <path d="M6,33 Q17,35 30,32" fill="none" stroke="rgba(150,210,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+          <!-- Keel -->
+          <line x1="17" y1="33" x2="15" y2="38" stroke="#FFD700" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="15" y1="38" x2="20" y2="38" stroke="#FFD700" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>`;
+      return el;
+    }
+
+    function updateGlobe() {
+      if (!globe) return;
+      globe
+        .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
+        .htmlElementsData([{ lat: vessel.lat, lng: vessel.lng }])
+        .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
+        .labelsData([
+          ...RALLY_ROUTE.map(w => ({
+            lat: w.lat, lng: w.lng,
+            text: `${w.name}  ${w.date}`,
+            color: w.done ? '#7aaabb' : '#334455',
+            size: 0.7,
+          })),
+          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
+        ])
+        .pathsData([
+          { coords: rallyCoords(w => w.done),  style: 'done'     },
+          { coords: rallyCoords(w => !w.done), style: 'upcoming' },
+          { coords: buildGpsTrack(),           style: 'gps'      },
+        ]);
+    }
+
+    function setStatus(state) {
+      const dot  = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      if (state === 'live') {
+        dot.className = 'live';
+        text.textContent = 'Live data';
+      } else if (state === 'stale') {
+        dot.className = '';
+        dot.style.background = '#ffa500';
+        text.textContent = 'Last known position';
+      } else {
+        dot.className = '';
+        dot.style.background = '#555';
+        text.textContent = 'No data source configured';
+      }
+    }
+
+    async function fetchPosition() {
+      if (!DATA_URL) {
+        setStatus('stale');
+        return;
+      }
+      try {
+        const res = await fetch(`${DATA_URL}&_=${Date.now()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        vessel = parseResponse(json);
+        updatePanel();
+        updateGlobe();
+        setStatus('live');
+      } catch (err) {
+        console.warn('Position fetch failed:', err);
+        setStatus('stale');
+      }
+    }
+
+    // ─── Day / night terminator ──────────────────────────────────
+    // Injected directly into the globe's own MeshPhongMaterial shader
+    // via onBeforeCompile — no external Three.js import needed.
+
+    let nightSunUniform = null;
+
+    function getSunPosition() {
+      const now = new Date();
+      const dayOfYear = (now - new Date(now.getFullYear(), 0, 0)) / 86_400_000;
+      const declination = -23.45 * Math.cos((2 * Math.PI / 365) * (dayOfYear + 10));
+      const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+      const longitude  = (utcHours / 24 - 0.5) * -360;
+      return { lat: declination, lng: longitude };
+    }
+
+    function addNightOverlay() {
+      // Borrow Vector3 constructor from the camera — no external THREE needed
+      const Vector3 = globe.camera().position.constructor;
+      nightSunUniform = { value: new Vector3() };
+
+      const mat = globe.globeMaterial();
+
+      mat.onBeforeCompile = shader => {
+        shader.uniforms.sunDir = nightSunUniform;
+
+        // Inject world-normal varying into vertex shader
+        shader.vertexShader = shader.vertexShader
+          .replace('#include <common>',
+            '#include <common>\nvarying vec3 vWorldNormal;')
+          .replace('#include <begin_vertex>',
+            '#include <begin_vertex>\nvWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);');
+
+        // Inject night darkening into fragment shader
+        shader.fragmentShader = shader.fragmentShader
+          .replace('#include <common>',
+            '#include <common>\nuniform vec3 sunDir;\nvarying vec3 vWorldNormal;')
+          .replace(
+            'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+            `gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+             float _night = smoothstep(0.07, -0.07, dot(normalize(vWorldNormal), sunDir)) * 0.75;
+             gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.01, 0.06), _night);`
+          );
+      };
+
+      mat.needsUpdate = true;
+      updateNight();
+    }
+
+    function updateNight() {
+      if (!nightSunUniform) return;
+      const { lat, lng } = getSunPosition();
+      const phi   = (90 - lat) * Math.PI / 180;
+      const theta = lng        * Math.PI / 180;
+      nightSunUniform.value.set(
+        Math.sin(phi) * Math.cos(theta),
+        Math.cos(phi),
+        Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    // ─── Build the globe ─────────────────────────────────────────
+
+    function initGlobe() {
+      const container = document.getElementById('globe-container');
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      globe = Globe({ animateIn: false })
+        .width(W)
+        .height(H)
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+        // ── Waypoint dots (no current-position dot — replaced by yacht icon) ──
+        .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
+        .pointColor(d => d.done ? '#4488aa' : '#223344')
+        .pointAltitude(0.005)
+        .pointRadius(0.35)
+        // ── Yacht icon at current position ──
+        .htmlElementsData([{ lat: vessel.lat, lng: vessel.lng }])
+        .htmlElement(() => buildYachtIcon())
+        // ── Pulse ring ──
+        .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
+        .ringColor(() => '#ffd70066')
+        .ringMaxRadius(3)
+        .ringPropagationSpeed(1)
+        .ringRepeatPeriod(1200)
+        // ── Three paths: completed rally legs, upcoming rally legs, GPS track ──
+        .pathsData([
+          { coords: rallyCoords(w => w.done),  style: 'done'     },
+          { coords: rallyCoords(w => !w.done), style: 'upcoming' },
+          { coords: buildGpsTrack(),           style: 'gps'      },
+        ])
+        .pathPoints('coords')
+        .pathPointLat(p => p[0])
+        .pathPointLng(p => p[1])
+        .pathColor(d => {
+          if (d.style === 'done')     return ['rgba(100,180,220,0.7)', 'rgba(100,180,220,0.3)'];
+          if (d.style === 'upcoming') return ['rgba(50,80,110,0.5)',   'rgba(50,80,110,0.2)' ];
+          return ['rgba(255,215,0,0.9)', 'rgba(255,215,0,0.1)'];  // GPS track
+        })
+        .pathStroke(d => d.style === 'gps' ? 1.4 : 0.8)
+        .pathDashLength(d => d.style === 'upcoming' ? 0.03 : 0)
+        .pathDashGap(d => d.style === 'upcoming' ? 0.01 : 0)
+        .pathDashAnimateTime(d => d.style === 'gps' ? 10000 : 0)
+        // ── Labels ──
+        .labelsData([
+          ...RALLY_ROUTE.map(w => ({
+            lat: w.lat, lng: w.lng,
+            text: `${w.name}  ${w.date}`,
+            color: w.done ? '#7aaabb' : '#334455',
+            size: 0.7,
+          })),
+          { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
+        ])
+        .labelText('text')
+        .labelColor(d => d.color)
+        .labelSize(d => d.size)
+        .labelDotRadius(0)
+        .labelResolution(3)
+        .labelAltitude(0.01)
+        .enablePointerInteraction(true)
+        (container);
+
+      // Set camera after mount so it isn't overridden by initialisation
+      setTimeout(() => {
+        globe.pointOfView({ lat: vessel.lat, lng: vessel.lng, altitude: 2.0 }, 0);
+      }, 0);
+
+      // Gentle auto-rotate
+      globe.controls().autoRotate = true;
+      globe.controls().autoRotateSpeed = 0.3;
+      globe.controls().enableDamping = true;
+
+      // Stop auto-rotate while user is interacting
+      globe.controls().addEventListener('start', () => {
+        globe.controls().autoRotate = false;
+      });
+
+      // Resize handler
+      window.addEventListener('resize', () => {
+        globe.width(window.innerWidth).height(window.innerHeight);
+      });
+
+      // Day/night overlay
+      addNightOverlay();
+      setInterval(updateNight, 60_000); // re-sync sun position every minute
+
+      // Hide loading screen once globe has started rendering
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+      }, 1200);
+    }
+
+    // ─── Journey info box ─────────────────────────────────────────
+
+    function populateJourney() {
+      const current = [...RALLY_ROUTE].reverse().find(w => w.done);
+      const next    = RALLY_ROUTE.find(w => !w.done);
+
+      if (current) {
+        document.getElementById('j-cur-flag').textContent    = current.flag;
+        document.getElementById('j-cur-place').textContent   = current.name;
+        document.getElementById('j-cur-country').textContent = current.country;
+      }
+      if (next) {
+        document.getElementById('j-nxt-flag').textContent    = next.flag;
+        document.getElementById('j-nxt-place').textContent   = next.name;
+        document.getElementById('j-nxt-country').textContent = next.country;
+        document.getElementById('j-nxt-date').textContent    = next.date;
+      }
+    }
+
+    // ─── Boot ────────────────────────────────────────────────────
+
+    updatePanel();
+    populateJourney();
+    setStatus(DATA_URL ? 'connecting' : 'stale');
+
+    // Globe.gl loads async via the CDN script tag above.
+    // Wait for it to be available before initialising.
+    function waitForGlobe() {
+      if (typeof Globe !== 'undefined') {
+        initGlobe();
+        fetchPosition();
+        if (DATA_URL) setInterval(fetchPosition, REFRESH_INTERVAL_MS);
+      } else {
+        setTimeout(waitForGlobe, 50);
+      }
+    }
+    waitForGlobe();
+  </script>
+
+</body>
+</html>
