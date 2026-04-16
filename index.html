@@ -351,21 +351,20 @@
     /* ── Mobile bottom column: current + next popup ──────────── */
     #m-bottom-col {
       position: fixed;
-      bottom: 70px;
-      left: 16px;
+      bottom: 0;
+      left: 0;
+      right: 0;
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-width: 210px;
+      gap: 0;
     }
 
     #m-next-popup {
       display: none;
-      background: rgba(5, 10, 20, 0.93);
-      border: 1px solid rgba(100, 180, 255, 0.22);
-      border-radius: 10px;
-      padding: 13px 15px;
+      background: rgba(4, 9, 18, 0.96);
+      border-top: 1px solid rgba(100, 180, 255, 0.18);
+      padding: 14px 20px 10px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -373,10 +372,9 @@
     #m-next-popup.open { display: block; }
 
     #m-current {
-      background: rgba(5, 10, 20, 0.88);
-      border: 1px solid rgba(100, 180, 255, 0.2);
-      border-radius: 10px;
-      padding: 12px 14px;
+      background: rgba(4, 9, 18, 0.96);
+      border-top: 1px solid rgba(100, 180, 255, 0.2);
+      padding: 14px 20px 28px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
