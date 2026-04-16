@@ -597,7 +597,7 @@
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
         .htmlElementsData([
           { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
-          ...RALLY_ROUTE.filter(w =>  w.done).map(w => ({ type: 'past',    ...w })),
+          ...RALLY_ROUTE.filter((w, i, arr) => w.done && i !== arr.findLastIndex(x => x.done)).map(w => ({ type: 'past', ...w })),
           ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
         ])
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
@@ -727,7 +727,7 @@
         // ── Yacht icon + upcoming waypoint labels (HTML so emoji + multiline work) ──
         .htmlElementsData([
           { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
-          ...RALLY_ROUTE.filter(w =>  w.done).map(w => ({ type: 'past',    ...w })),
+          ...RALLY_ROUTE.filter((w, i, arr) => w.done && i !== arr.findLastIndex(x => x.done)).map(w => ({ type: 'past', ...w })),
           ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
         ])
         .htmlElement(d => {
