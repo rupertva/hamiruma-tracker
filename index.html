@@ -685,7 +685,7 @@
           .replace(
             'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
             `gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-             float _night = smoothstep(0.07, -0.07, dot(normalize(vWorldNormal), sunDir)) * 0.75;
+             float _night = smoothstep(0.1, -0.1, dot(normalize(vWorldNormal), sunDir)) * 0.6;
              gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.01, 0.06), _night);`
           );
       };
@@ -719,6 +719,8 @@
         .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+        .atmosphereColor('rgba(80,180,255,1)')
+        .atmosphereAltitude(0.2)
         // ── Waypoint dots: dim for visited, bright for upcoming ──
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
         .pointColor(d => d.done ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)')
@@ -788,6 +790,12 @@
       // Resize handler
       window.addEventListener('resize', () => {
         globe.width(window.innerWidth).height(window.innerHeight);
+      });
+
+      // Boost scene lighting for a brighter, more vibrant globe
+      globe.scene().traverse(obj => {
+        if (obj.isAmbientLight)     obj.intensity *= 2.8;
+        if (obj.isDirectionalLight) obj.intensity *= 1.5;
       });
 
       // Day/night overlay
