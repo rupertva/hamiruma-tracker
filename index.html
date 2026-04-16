@@ -434,6 +434,7 @@
     // done: true = leg completed (as of Apr 15 2026)
     const RALLY_ROUTE = [
       { lat:  17.1,  lng:  -61.8,  name: 'Antigua',              date: 'Jan 17',     done: true,  flag: '🇦🇬', country: 'Antigua & Barbuda'  },
+      { lat:  10.4,  lng:  -75.5,  name: 'Cartagena',             date: 'Jan 25',     done: true,  flag: '🇨🇴', country: 'Colombia'            },
       { lat:   9.1,  lng:  -79.7,  name: 'Panama Canal',          date: 'Feb 12',     done: true,  flag: '🇵🇦', country: 'Panama'             },
       { lat:  -0.7,  lng:  -90.3,  name: 'Galapagos Islands',     date: 'Mar 4',      done: true,  flag: '🇪🇨', country: 'Ecuador'            },
       { lat:  -9.8,  lng: -139.0,  name: 'Hiva Oa, Marquesas',    date: 'Apr 4',      done: true,  flag: '🇵🇫', country: 'French Polynesia'   },
@@ -541,6 +542,16 @@
       return RALLY_ROUTE.filter(filterFn).map(w => [w.lat, w.lng]);
     }
 
+    function buildPastLabel(w) {
+      const el = document.createElement('div');
+      el.style.cssText = 'pointer-events:none;text-align:center;transform:translate(-50%,6px);line-height:1.2;opacity:0.55;';
+      el.innerHTML = `
+        <div style="font-size:13px;">${w.flag}</div>
+        <div style="font-size:9px;color:rgba(200,200,200,0.8);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:2px;white-space:nowrap;">${w.name}</div>
+        <div style="font-size:8px;color:rgba(180,180,180,0.6);font-family:'SF Mono',monospace;letter-spacing:0.04em;margin-top:1px;">${w.date}</div>`;
+      return el;
+    }
+
     function buildWaypointLabel(w) {
       const el = document.createElement('div');
       el.style.cssText = [
@@ -586,16 +597,11 @@
         .pointsData(RALLY_ROUTE.map(w => ({ lat: w.lat, lng: w.lng, done: w.done })))
         .htmlElementsData([
           { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
+          ...RALLY_ROUTE.filter(w =>  w.done).map(w => ({ type: 'past',    ...w })),
           ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
         ])
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .labelsData([
-          ...RALLY_ROUTE.filter(w => w.done).map(w => ({
-            lat: w.lat, lng: w.lng,
-            text: w.name,
-            color: 'rgba(255,255,255,0.25)',
-            size: 0.55,
-          })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
         .pathsData([
@@ -721,9 +727,14 @@
         // ── Yacht icon + upcoming waypoint labels (HTML so emoji + multiline work) ──
         .htmlElementsData([
           { type: 'yacht', lat: vessel.lat, lng: vessel.lng },
+          ...RALLY_ROUTE.filter(w =>  w.done).map(w => ({ type: 'past',    ...w })),
           ...RALLY_ROUTE.filter(w => !w.done).map(w => ({ type: 'waypoint', ...w })),
         ])
-        .htmlElement(d => d.type === 'yacht' ? buildYachtIcon() : buildWaypointLabel(d))
+        .htmlElement(d => {
+          if (d.type === 'yacht')    return buildYachtIcon();
+          if (d.type === 'past')     return buildPastLabel(d);
+          return buildWaypointLabel(d);
+        })
         // ── Pulse ring ──
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .ringColor(() => '#ffd70066')
@@ -748,12 +759,6 @@
         .pathDashAnimateTime(d => d.style === 'gps' ? 10000 : 0)
         // ── Labels ──
         .labelsData([
-          ...RALLY_ROUTE.filter(w => w.done).map(w => ({
-            lat: w.lat, lng: w.lng,
-            text: w.name,
-            color: 'rgba(255,255,255,0.25)',
-            size: 0.55,
-          })),
           { lat: vessel.lat, lng: vessel.lng, text: 'Hamiruma', color: '#ffd700', size: 1.5 },
         ])
         .labelText('text')
