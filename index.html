@@ -301,24 +301,145 @@
       50% { transform: rotate(5deg); }
     }
 
-    /* ── Mobile button + drawer (hidden on desktop) ─────────── */
-    #mobile-btn, #mobile-drawer, #mobile-backdrop { display: none; }
+    /* ── Mobile-only elements (hidden on desktop) ───────────── */
+    #mobile-btn, #mobile-drawer, #mobile-backdrop,
+    #m-header, #m-bottom-col { display: none; }
+
+    /* ── Mobile compact header ───────────────────────────────── */
+    #m-header {
+      background: rgba(5, 10, 20, 0.88);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px 16px 14px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .m-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #ffffff;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .m-sub {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: #4a7090;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .m-day-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffd700;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      margin-top: 10px;
+    }
+
+    .m-day-sub {
+      font-size: 10px;
+      color: #5b8aaa;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    /* ── Mobile bottom column: current + next popup ──────────── */
+    #m-bottom-col {
+      position: fixed;
+      bottom: 70px;
+      left: 16px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 210px;
+    }
+
+    #m-next-popup {
+      display: none;
+      background: rgba(5, 10, 20, 0.93);
+      border: 1px solid rgba(100, 180, 255, 0.22);
+      border-radius: 10px;
+      padding: 13px 15px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    #m-next-popup.open { display: block; }
+
+    #m-current {
+      background: rgba(5, 10, 20, 0.88);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .m-section-hd {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: #4a7090;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .m-popup-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .m-close-btn {
+      background: none;
+      border: none;
+      color: #4a7090;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      font-family: inherit;
+    }
+
+    #m-next-btn {
+      display: block;
+      margin-top: 9px;
+      background: rgba(100, 180, 255, 0.08);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: #6aabcc;
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    #m-next-btn:active { background: rgba(100,180,255,0.18); }
 
     /* ── Mobile layout ──────────────────────────────────────── */
     @media (max-width: 600px) {
-      #left-panel {
+      /* Desktop panels hidden on mobile */
+      #left-panel, #right-panel, #info-strip { display: none; }
+
+      /* Mobile-specific panels shown */
+      #m-header {
+        display: block;
+        position: fixed;
         top: 16px;
         left: 16px;
         right: 16px;
-        width: auto;
-        padding: 14px 16px;
+        z-index: 10;
       }
 
-      .logo-text { font-size: 18px; }
-      .day-num   { font-size: 21px; }
-
-      /* Hidden on mobile — content lives in the drawer instead */
-      #right-panel, #info-strip { display: none; }
+      #m-bottom-col { display: flex; }
 
       /* ── More info button ─────────────────────────────────── */
       #mobile-btn {
@@ -493,6 +614,41 @@
     <div id="status-row">
       <div id="status-dot"></div>
       <div id="status-text">connecting…</div>
+    </div>
+  </div>
+
+  <!-- Mobile compact header (top) -->
+  <div id="m-header">
+    <div class="m-name">Hamiruma</div>
+    <div class="m-sub">Oyster World Rally 2026/27</div>
+    <div class="m-day-num"><span id="m-day-x">–</span></div>
+    <div class="m-day-sub" id="m-day-of-total"></div>
+  </div>
+
+  <!-- Mobile bottom: current location + next popup -->
+  <div id="m-bottom-col">
+    <div id="m-next-popup">
+      <div class="m-popup-top">
+        <span class="m-section-hd" style="margin-bottom:0;">Next Stop</span>
+        <button class="m-close-btn" onclick="toggleNextPopup()">×</button>
+      </div>
+      <div class="section-flag" id="m-j-nxt-flag"></div>
+      <div class="section-place" id="m-j-nxt-place"></div>
+      <div class="section-country" id="m-j-nxt-country"></div>
+      <div class="section-date" id="m-j-nxt-date"></div>
+    </div>
+
+    <div id="m-current">
+      <div class="m-section-hd">Current Location</div>
+      <div class="section-flag" id="m-j-cur-flag"></div>
+      <div class="section-place" id="m-j-cur-place"></div>
+      <div class="section-country" id="m-j-cur-country"></div>
+      <div class="local-time-row">
+        <div class="local-time-val" id="m-j-local-time"></div>
+        <div class="local-time-lbl">Local</div>
+      </div>
+      <div class="tz-info" id="m-j-tz-info"></div>
+      <button id="m-next-btn" onclick="toggleNextPopup()">Next stop ›</button>
     </div>
   </div>
 
@@ -784,6 +940,10 @@
       });
     }
 
+    function toggleNextPopup() {
+      document.getElementById('m-next-popup').classList.toggle('open');
+    }
+
     function toggleMobileDrawer() {
       const drawer   = document.getElementById('mobile-drawer');
       const backdrop = document.getElementById('mobile-backdrop');
@@ -984,15 +1144,22 @@
       const next    = RALLY_ROUTE.find(w => !w.done);
 
       if (current) {
-        document.getElementById('j-cur-flag').textContent    = current.flag;
-        document.getElementById('j-cur-place').textContent   = current.name;
-        document.getElementById('j-cur-country').textContent = current.country;
+        setText('j-cur-flag',    current.flag);
+        setText('j-cur-place',   current.name);
+        setText('j-cur-country', current.country);
+        setText('m-j-cur-flag',    current.flag);
+        setText('m-j-cur-place',   current.name);
+        setText('m-j-cur-country', current.country);
       }
       if (next) {
-        document.getElementById('j-nxt-flag').textContent    = next.flag;
-        document.getElementById('j-nxt-place').textContent   = next.name;
-        document.getElementById('j-nxt-country').textContent = next.country;
-        document.getElementById('j-nxt-date').textContent    = next.date;
+        setText('j-nxt-flag',    next.flag);
+        setText('j-nxt-place',   next.name);
+        setText('j-nxt-country', next.country);
+        setText('j-nxt-date',    next.date);
+        setText('m-j-nxt-flag',    next.flag);
+        setText('m-j-nxt-place',   next.name);
+        setText('m-j-nxt-country', next.country);
+        setText('m-j-nxt-date',    next.date);
       }
     }
 
@@ -1020,8 +1187,10 @@
       const now         = new Date();
       const dayNum      = Math.max(1, Math.floor((now - RALLY_START) / 86_400_000) + 1);
 
-      document.getElementById('day-x').textContent       = 'Day ' + Math.min(dayNum, totalDays);
-      document.getElementById('day-of-total').textContent = 'of ' + totalDays + ' · Oyster World Rally';
+      const dayStr = 'Day ' + Math.min(dayNum, totalDays);
+      const subStr = 'of ' + totalDays + ' · Oyster World Rally';
+      setText('day-x',        dayStr); setText('m-day-x',        dayStr);
+      setText('day-of-total', subStr); setText('m-day-of-total', subStr);
     }
 
     function updateLocalTime() {
@@ -1051,8 +1220,10 @@
       const diffHalf = (behindHrs % 1) !== 0;
       const diffLabel = `${diffH}${diffHalf ? '½' : ''}h behind UK`;
 
-      document.getElementById('j-local-time').textContent = timeStr;
-      document.getElementById('j-tz-info').textContent    = `${offLabel} · ${diffLabel}`;
+      setText('j-local-time',   timeStr);
+      setText('j-tz-info',      `${offLabel} · ${diffLabel}`);
+      setText('m-j-local-time', timeStr);
+      setText('m-j-tz-info',    `${offLabel} · ${diffLabel}`);
     }
 
     // ─── Boot ────────────────────────────────────────────────────
