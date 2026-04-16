@@ -416,7 +416,7 @@
     //  Endpoint confirmed via DevTools on my.yb.tl/hamiruma
     //  Response: { positions: [{at (ms), t (lat), g (lng), id}] }
     //
-    const DATA_URL = 'https://app.yb.tl/APIX/Blog/GetPositions?keyword=hamiruma&event=16273';
+    const DATA_URL = './position.json';
     const REFRESH_INTERVAL_MS = 5 * 60_000; // re-fetch every 5 minutes
 
     // Last known position — used when live data is unavailable or on first load.
@@ -608,7 +608,7 @@
         return;
       }
       try {
-        const res = await fetch(`${DATA_URL}&_=${Date.now()}`);
+        const res = await fetch(`${DATA_URL}?_=${Date.now()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         vessel = parseResponse(json);
