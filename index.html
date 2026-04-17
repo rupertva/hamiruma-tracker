@@ -384,9 +384,9 @@
     /* ── Mobile bottom column: current + next popup ──────────── */
     #m-bottom-col {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
       z-index: 10;
       flex-direction: column;
       gap: 0;
@@ -396,19 +396,23 @@
       display: none;
       background: rgba(240, 243, 248, 0.8);
       border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 14px 20px 10px;
+      padding: 10px 14px 8px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      border-radius: 10px 10px 0 0;
     }
 
     #m-next-popup.open { display: block; }
+    #m-next-popup.open + #m-current { border-radius: 0 0 10px 10px; }
 
     #m-current {
       background: rgba(240, 243, 248, 0.8);
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 10px 16px 20px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px 12px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
     }
 
     .m-section-hd {
