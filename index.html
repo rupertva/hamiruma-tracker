@@ -50,19 +50,24 @@
     }
 
     .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 8px;
     }
 
     .logo-img {
-      width: 100%;
+      width: 50px;
+      height: 50px;
       display: block;
       object-fit: contain;
+      flex-shrink: 0;
     }
 
     .logo-text-img {
-      width: 70%;
+      height: 16px;
       display: block;
-      margin: 4px auto 2px;
+      margin-bottom: 3px;
       object-fit: contain;
     }
 
@@ -538,8 +543,10 @@
   <div id="left-panel">
     <div class="logo-section">
       <img class="logo-img" src="./logo.png" alt="Hamiruma logo">
-      <img class="logo-text-img" src="./logo-text.png" alt="Hamiruma">
-      <div class="logo-sub">Oyster World Rally 2026/27</div>
+      <div>
+        <img class="logo-text-img" src="./logo-text.png" alt="Hamiruma">
+        <div class="logo-sub">Oyster World Rally 2026/27</div>
+      </div>
     </div>
 
     <hr class="divider" />
