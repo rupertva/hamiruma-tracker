@@ -1111,9 +1111,9 @@
         if (obj.isDirectionalLight) obj.intensity = 3.0;
       });
 
-      // Day/night overlay
-      addNightOverlay();
-      setInterval(updateNight, 60_000); // re-sync sun position every minute
+      // Day/night overlay — disabled for now
+      // addNightOverlay();
+      // setInterval(updateNight, 60_000);
 
       // Hide loading screen once globe has started rendering
       setTimeout(() => {
