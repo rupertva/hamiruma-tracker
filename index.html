@@ -997,8 +997,8 @@
           .replace(
             'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
             `gl_FragColor = vec4( outgoingLight, diffuseColor.a );
-             float _night = smoothstep(0.1, -0.1, dot(normalize(vWorldNormal), sunDir)) * 0.6;
-             gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.01, 0.06), _night);`
+             float _night = smoothstep(0.1, -0.1, dot(normalize(vWorldNormal), sunDir)) * 0.35;
+             gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.01, 0.02, 0.08), _night);`
           );
       };
 
@@ -1102,13 +1102,13 @@
         globe.width(window.innerWidth).height(window.innerHeight);
       });
 
-      // Match Artemis II tracker lighting: directional 2.5, ambient 0.4 (dark blue tint)
+      // Lighting: bright enough to see land detail clearly
       globe.scene().traverse(obj => {
         if (obj.isAmbientLight) {
-          obj.intensity = 0.4;
-          obj.color.setHex(0x1a1a3a);
+          obj.intensity = 1.4;
+          obj.color.setHex(0x4466aa);
         }
-        if (obj.isDirectionalLight) obj.intensity = 2.5;
+        if (obj.isDirectionalLight) obj.intensity = 3.0;
       });
 
       // Day/night overlay
