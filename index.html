@@ -27,13 +27,14 @@
       top: 32px;
       left: 32px;
       z-index: 10;
-      background: rgba(5, 10, 20, 0.85);
-      border: 1px solid rgba(100, 180, 255, 0.2);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 12px;
       padding: 20px 22px;
       width: 248px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
 
     .logo-section {
@@ -48,14 +49,13 @@
       height: 64px;
       object-fit: contain;
       flex-shrink: 0;
-      mix-blend-mode: screen;
     }
 
     .logo-text {
       font-size: 22px;
       font-weight: 700;
       letter-spacing: 0.12em;
-      color: #ffffff;
+      color: #1a1a2e;
       text-transform: uppercase;
       line-height: 1;
     }
@@ -63,14 +63,14 @@
     .logo-sub {
       font-size: 9px;
       letter-spacing: 0.14em;
-      color: #4a7090;
+      color: #7a8a9a;
       text-transform: uppercase;
       margin-top: 5px;
     }
 
     .divider {
       border: none;
-      border-top: 1px solid rgba(100, 160, 220, 0.12);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
       margin: 12px 0;
     }
 
@@ -78,14 +78,14 @@
     .day-num {
       font-size: 26px;
       font-weight: 700;
-      color: #f4a0b4;
+      color: #e0457b;
       letter-spacing: 0.04em;
       line-height: 1;
     }
 
     .day-sub {
       font-size: 10px;
-      color: #5b8aaa;
+      color: #7a8a9a;
       letter-spacing: 0.1em;
       margin-top: 3px;
     }
@@ -94,15 +94,15 @@
     .section-hd {
       font-size: 9px;
       letter-spacing: 0.22em;
-      color: #4a7090;
+      color: #7a8a9a;
       text-transform: uppercase;
       margin-bottom: 5px;
     }
 
     .section-flag  { font-size: 20px; line-height: 1; margin-bottom: 3px; }
-    .section-place { font-size: 14px; font-weight: 600; color: #e8eaf0; margin-bottom: 2px; }
-    .section-country { font-size: 10px; color: #5b8aaa; }
-    .section-date  { font-size: 10px; color: #f4a0b4; letter-spacing: 0.06em; margin-top: 2px; }
+    .section-place { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
+    .section-country { font-size: 10px; color: #7a8a9a; }
+    .section-date  { font-size: 10px; color: #e0457b; letter-spacing: 0.06em; margin-top: 2px; }
 
     .local-time-row {
       display: flex;
@@ -114,20 +114,20 @@
     .local-time-val {
       font-size: 18px;
       font-weight: 600;
-      color: #e8eaf0;
+      color: #1a1a2e;
       letter-spacing: 0.04em;
     }
 
     .local-time-lbl {
       font-size: 9px;
-      color: #4a7090;
+      color: #7a8a9a;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .tz-info {
       font-size: 10px;
-      color: #5b8aaa;
+      color: #7a8a9a;
       margin-top: 2px;
       letter-spacing: 0.04em;
     }
@@ -148,38 +148,40 @@
       display: flex;
       align-items: center;
       gap: 9px;
-      background: rgba(5, 10, 20, 0.75);
-      border: 1px solid rgba(100, 180, 255, 0.15);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 8px;
       padding: 10px 14px;
       text-decoration: none;
-      color: #6aabcc;
+      color: #1a1a2e;
       font-size: 12px;
       letter-spacing: 0.08em;
       transition: border-color 0.2s, color 0.2s;
       backdrop-filter: blur(8px);
       margin-bottom: 2px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    .insta-link:hover { border-color: rgba(100,180,255,0.45); color: #b0d8f0; }
+    .insta-link:hover { border-color: rgba(0,0,0,0.2); color: #e0457b; }
 
     .tracker-link {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(5, 10, 20, 0.6);
-      border: 1px solid rgba(100, 180, 255, 0.1);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(0, 0, 0, 0.06);
       border-radius: 6px;
       padding: 7px 12px;
       text-decoration: none;
-      color: #3d6a88;
+      color: #5a6a7a;
       font-size: 11px;
       letter-spacing: 0.08em;
       transition: border-color 0.2s, color 0.2s;
       backdrop-filter: blur(8px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
 
-    .tracker-link:hover { border-color: rgba(100,180,255,0.35); color: #7aaabb; }
+    .tracker-link:hover { border-color: rgba(0,0,0,0.15); color: #1a1a2e; }
     .tracker-link .link-icon { width: 16px; height: 16px; border-radius: 3px; display: block; }
 
     /* ── Info strip (bottom-right): compact stats ────────────── */
@@ -188,13 +190,14 @@
       bottom: 32px;
       right: 32px;
       z-index: 10;
-      background: rgba(5, 10, 20, 0.7);
-      border: 1px solid rgba(100, 180, 255, 0.11);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 8px;
       padding: 11px 15px;
       min-width: 220px;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .info-row {
@@ -209,7 +212,7 @@
     .info-lbl {
       font-size: 9px;
       letter-spacing: 0.12em;
-      color: #2e4e68;
+      color: #7a8a9a;
       text-transform: uppercase;
       flex-shrink: 0;
       width: 26px;
@@ -217,16 +220,16 @@
 
     .info-val {
       font-size: 11px;
-      color: #7aaccf;
+      color: #1a1a2e;
       flex: 1;
     }
 
-    .info-val.hi { color: #a0ccee; }
-    .info-sep { color: #1e3448; font-size: 10px; }
+    .info-val.hi { color: #1a1a2e; }
+    .info-sep { color: #ccc; font-size: 10px; }
 
     .info-muted {
       font-size: 9px;
-      color: #2e4e68;
+      color: #7a8a9a;
       letter-spacing: 0.05em;
       gap: 4px;
     }
@@ -259,7 +262,7 @@
 
     #status-text {
       font-size: 9px;
-      color: #2e4e68;
+      color: #7a8a9a;
       letter-spacing: 0.1em;
     }
 
@@ -305,22 +308,30 @@
 
     /* ── Mobile compact header ───────────────────────────────── */
     #m-header {
-      background: rgba(5, 10, 20, 0.88);
-      border: 1px solid rgba(100, 180, 255, 0.2);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 10px;
       padding: 10px 14px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+
+    .m-logo-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      flex-shrink: 0;
     }
 
     .m-name {
       font-size: 16px;
       font-weight: 700;
       letter-spacing: 0.12em;
-      color: #ffffff;
+      color: #1a1a2e;
       text-transform: uppercase;
       line-height: 1;
     }
@@ -328,7 +339,7 @@
     .m-sub {
       font-size: 8px;
       letter-spacing: 0.14em;
-      color: #4a7090;
+      color: #7a8a9a;
       text-transform: uppercase;
       margin-top: 3px;
     }
@@ -336,7 +347,7 @@
     .m-day-num {
       font-size: 18px;
       font-weight: 700;
-      color: #f4a0b4;
+      color: #e0457b;
       line-height: 1;
       letter-spacing: 0.04em;
       text-align: right;
@@ -344,7 +355,7 @@
 
     .m-day-sub {
       font-size: 9px;
-      color: #5b8aaa;
+      color: #7a8a9a;
       letter-spacing: 0.08em;
       margin-top: 2px;
       text-align: right;
@@ -363,8 +374,8 @@
 
     #m-next-popup {
       display: none;
-      background: rgba(4, 9, 18, 0.96);
-      border-top: 1px solid rgba(100, 180, 255, 0.18);
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
       padding: 14px 20px 10px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -373,8 +384,8 @@
     #m-next-popup.open { display: block; }
 
     #m-current {
-      background: rgba(4, 9, 18, 0.96);
-      border-top: 1px solid rgba(100, 180, 255, 0.2);
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
       padding: 10px 16px 20px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -383,7 +394,7 @@
     .m-section-hd {
       font-size: 9px;
       letter-spacing: 0.2em;
-      color: #4a7090;
+      color: #7a8a9a;
       text-transform: uppercase;
       margin-bottom: 6px;
     }
@@ -398,7 +409,7 @@
     .m-close-btn {
       background: none;
       border: none;
-      color: #4a7090;
+      color: #7a8a9a;
       font-size: 16px;
       cursor: pointer;
       padding: 0;
@@ -413,11 +424,11 @@
     }
 
     #m-next-btn, #m-info-btn {
-      background: rgba(100, 180, 255, 0.07);
-      border: 1px solid rgba(100, 180, 255, 0.18);
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.12);
       border-radius: 7px;
       padding: 6px 10px;
-      color: #6aabcc;
+      color: #1a1a2e;
       font-family: inherit;
       font-size: 10px;
       letter-spacing: 0.06em;
@@ -427,7 +438,7 @@
       transition: background 0.15s;
     }
 
-    #m-next-btn:active, #m-info-btn:active { background: rgba(100,180,255,0.18); }
+    #m-next-btn:active, #m-info-btn:active { background: rgba(0,0,0,0.1); }
 
     /* ── Mobile layout ──────────────────────────────────────── */
     @media (max-width: 600px) {
@@ -464,8 +475,8 @@
         left: 0;
         right: 0;
         z-index: 18;
-        background: rgba(4, 9, 18, 0.97);
-        border-top: 1px solid rgba(100, 180, 255, 0.2);
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 16px 16px 0 0;
         padding: 12px 20px 36px;
         transform: translateY(105%);
@@ -479,7 +490,7 @@
       .drawer-handle {
         width: 36px;
         height: 3px;
-        background: rgba(100, 180, 255, 0.2);
+        background: rgba(0, 0, 0, 0.15);
         border-radius: 2px;
         margin: 0 auto 16px;
       }
@@ -553,7 +564,7 @@
   <!-- Right panel: Instagram + tracker links -->
   <div id="right-panel">
     <a class="insta-link" href="https://www.instagram.com/hamiruma_/" target="_blank" rel="noopener">
-      <img style="width:19px;height:19px;border-radius:50%;display:block;flex-shrink:0;filter:invert(1) opacity(0.65);" src="./instagram.png" alt="Instagram">
+      <img style="width:19px;height:19px;border-radius:50%;display:block;flex-shrink:0;opacity:0.7;" src="./instagram.png" alt="Instagram">
       Follow along @hamiruma_
     </a>
     <a class="tracker-link" href="https://my.yb.tl/hamiruma" target="_blank" rel="noopener">
@@ -596,7 +607,8 @@
 
   <!-- Mobile compact header (top) -->
   <div id="m-header">
-    <div>
+    <img class="m-logo-img" src="./logo.png" alt="Hamiruma logo">
+    <div style="flex:1;min-width:0;">
       <div class="m-name">Hamiruma</div>
       <div class="m-sub">Oyster World Rally 2026/27</div>
     </div>
@@ -651,7 +663,7 @@
 
     <div class="drawer-links">
       <a class="insta-link" href="https://www.instagram.com/hamiruma_/" target="_blank" rel="noopener">
-        <img style="width:17px;height:17px;border-radius:50%;display:block;flex-shrink:0;filter:invert(1) opacity(0.65);" src="./instagram.png" alt="Instagram">
+        <img style="width:17px;height:17px;border-radius:50%;display:block;flex-shrink:0;opacity:0.7;" src="./instagram.png" alt="Instagram">
         Follow along @hamiruma_
       </a>
       <a class="tracker-link" href="https://my.yb.tl/hamiruma" target="_blank" rel="noopener">
