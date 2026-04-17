@@ -1102,14 +1102,26 @@
         globe.width(window.innerWidth).height(window.innerHeight);
       });
 
-      // Lighting: bright enough to see land detail clearly
+      // Match Artemis II lighting & tone mapping
+      const renderer = globe.renderer();
+      renderer.toneMapping = 4;        // ACESFilmicToneMapping
+      renderer.toneMappingExposure = 1.1;
+
       globe.scene().traverse(obj => {
         if (obj.isAmbientLight) {
-          obj.intensity = 1.4;
-          obj.color.setHex(0x4466aa);
+          obj.intensity = 0.4;
+          obj.color.setHex(0x1a1a3a);
         }
-        if (obj.isDirectionalLight) obj.intensity = 3.0;
+        if (obj.isDirectionalLight) {
+          obj.intensity = 2.5;
+          obj.color.setHex(0xffffff);
+        }
       });
+
+      // Add emissive glow to the globe surface (like Artemis)
+      const mat = globe.globeMaterial();
+      mat.emissive = { r: 0x11/255, g: 0x22/255, b: 0x44/255 };
+      mat.emissiveIntensity = 0.2;
 
       // Day/night overlay — disabled for now
       // addNightOverlay();
