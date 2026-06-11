@@ -532,6 +532,20 @@
         justify-content: flex-start;
       }
     }
+
+    /* Required attribution for Esri World Imagery tiles */
+    #imagery-credit {
+      position: fixed;
+      left: 10px;
+      bottom: 5px;
+      z-index: 4;
+      font-family: 'SF Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.04em;
+      color: rgba(255, 255, 255, 0.35);
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -542,6 +556,8 @@
   </div>
 
   <div id="globe-container"></div>
+
+  <div id="imagery-credit">Imagery © Esri · Maxar · Earthstar Geographics</div>
 
   <!-- Left panel: logo + day + now + next -->
   <div id="left-panel">
@@ -731,7 +747,8 @@
   </div>
 
   <!-- globe.gl via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2/dist/globe.gl.min.js"></script>
+  <!-- Pinned: the tile-engine threshold tweak below relies on library internals -->
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.1/dist/globe.gl.min.js"></script>
 
   <script>
     // ─────────────────────────────────────────────────────────────
@@ -1103,6 +1120,10 @@
         .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+        // Stream real satellite imagery tiles (Esri World Imagery) over the
+        // base texture — detail increases with zoom, Google-Maps style.
+        .globeTileEngineUrl((x, y, l) =>
+          `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`)
         .atmosphereColor('rgba(80,180,255,1)')
         .atmosphereAltitude(0.2)
         // ── Waypoint dots: dim for visited, bright for upcoming ──
@@ -1194,6 +1215,24 @@
       const mat = globe.globeMaterial();
       mat.emissive = { r: 0x11/255, g: 0x22/255, b: 0x44/255 };
       mat.emissiveIntensity = 0.2;
+
+      // Sharpen the tile engine when zoomed in. Its default distance→level
+      // thresholds (8/2^i globe radii) pick tiles ~4× too coarse for this
+      // viewport, capping out around level 10 at full zoom. Keep the far-out
+      // thresholds untouched so the initial global view stays light, and use
+      // 32/2^i once below 0.25 radii — full zoom then reaches level ~12
+      // (≈38 m/px) instead. Relies on internals of the pinned globe.gl build.
+      // The engine is created asynchronously, so poll until it appears.
+      (function biasTileEngine(attempts) {
+        let eng = null;
+        globe.scene().traverse(o => { if (!eng && Array.isArray(o.thresholds)) eng = o; });
+        if (!eng) {
+          if (attempts > 0) setTimeout(() => biasTileEngine(attempts - 1), 250);
+          return;
+        }
+        eng.thresholds = eng.thresholds.map((t, i) =>
+          i <= 4 ? t : i === 5 ? 0.4 : i === 6 ? 0.3 : 32 / 2 ** i);
+      })(40);
 
       // Day/night overlay — disabled for now
       // addNightOverlay();
