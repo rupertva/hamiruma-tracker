@@ -759,6 +759,22 @@
     const DATA_URL = './position.json';
     const REFRESH_INTERVAL_MS = 5 * 60_000; // re-fetch every 5 minutes
 
+    // Look overrides for previewing imagery/lighting combos,
+    // e.g. /?imagery=eox&light=bright&grade=vivid
+    const LOOK = new URLSearchParams(location.search);
+    const IMAGERY = LOOK.get('imagery') || 'esri';
+    const LIGHT   = LOOK.get('light')   || 'dark';
+    const GRADE   = LOOK.get('grade')   || 'none';
+    const TILE_URLS = {
+      esri: (x, y, l) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`,
+      eox:  (x, y, l) => `https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/${l}/${y}/${x}.jpg`,
+    };
+    const GRADES = {
+      none:  '',
+      vivid: 'saturate(1.5) brightness(1.1) contrast(1.05)',
+      cool:  'saturate(1.3) hue-rotate(-12deg) brightness(0.96) contrast(1.08)',
+    };
+
     // Last known position — used when live data is unavailable or on first load.
     // Neiafu, Vava'u, Tonga — most recent YB satellite ping as of Jun 11 2026.
     const LAST_KNOWN = {
@@ -1117,13 +1133,12 @@
       globe = Globe({ animateIn: false })
         .width(W)
         .height(H)
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .globeImageUrl('./earth-8k.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-        // Stream real satellite imagery tiles (Esri World Imagery) over the
-        // base texture — detail increases with zoom, Google-Maps style.
-        .globeTileEngineUrl((x, y, l) =>
-          `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`)
+        // Stream real satellite imagery tiles over the base texture —
+        // detail increases with zoom, Google-Maps style.
+        .globeTileEngineUrl(TILE_URLS[IMAGERY] || TILE_URLS.esri)
         .atmosphereColor('rgba(80,180,255,1)')
         .atmosphereAltitude(0.2)
         // ── Waypoint dots: dim for visited, bright for upcoming ──
@@ -1195,18 +1210,19 @@
         globe.width(window.innerWidth).height(window.innerHeight);
       });
 
-      // Match Artemis II lighting & tone mapping
+      // Lighting & tone mapping. 'dark' = Artemis II space look (default);
+      // 'bright' = even Apple-Maps-style daylight.
       const renderer = globe.renderer();
       renderer.toneMapping = 4;        // ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.1;
+      renderer.toneMappingExposure = LIGHT === 'bright' ? 1.15 : 1.1;
 
       globe.scene().traverse(obj => {
         if (obj.isAmbientLight) {
-          obj.intensity = 0.4;
-          obj.color.setHex(0x1a1a3a);
+          obj.intensity = LIGHT === 'bright' ? 1.9 : 0.4;
+          obj.color.setHex(LIGHT === 'bright' ? 0xffffff : 0x1a1a3a);
         }
         if (obj.isDirectionalLight) {
-          obj.intensity = 2.5;
+          obj.intensity = LIGHT === 'bright' ? 0.45 : 2.5;
           obj.color.setHex(0xffffff);
         }
       });
@@ -1214,15 +1230,20 @@
       // Add emissive glow to the globe surface (like Artemis)
       const mat = globe.globeMaterial();
       mat.emissive = { r: 0x11/255, g: 0x22/255, b: 0x44/255 };
-      mat.emissiveIntensity = 0.2;
+      mat.emissiveIntensity = LIGHT === 'bright' ? 0 : 0.2;
 
-      // Sharpen the tile engine when zoomed in. Its default distance→level
-      // thresholds (8/2^i globe radii) pick tiles ~4× too coarse for this
-      // viewport, capping out around level 10 at full zoom. Keep the far-out
-      // thresholds untouched so the initial global view stays light, and use
-      // 32/2^i once below 0.25 radii — full zoom then reaches level ~12
-      // (≈38 m/px) instead. Relies on internals of the pinned globe.gl build.
-      // The engine is created asynchronously, so poll until it appears.
+      // Optional colour grade applied to the whole globe canvas
+      if (GRADES[GRADE]) renderer.domElement.style.filter = GRADES[GRADE];
+
+      // Sharpen the tile engine across all zooms. Its default distance→level
+      // thresholds (8/2^i globe radii) pick tiles ~4-5× too coarse for this
+      // viewport: level 2 (~1000px around the equator) at the default view,
+      // capping at ~level 10 at full zoom. Scaling every threshold ×5 gives
+      // level 4 zoomed out and ~level 13 (≈19 m/px) at full zoom.
+      // Note: the tile layer IS the globe surface when the engine is active
+      // (the base globeImageUrl texture only shows while tiles stream in),
+      // so never hide it. Relies on internals of the pinned globe.gl build;
+      // the engine is created asynchronously, so poll until it appears.
       (function biasTileEngine(attempts) {
         let eng = null;
         globe.scene().traverse(o => { if (!eng && Array.isArray(o.thresholds)) eng = o; });
@@ -1230,8 +1251,7 @@
           if (attempts > 0) setTimeout(() => biasTileEngine(attempts - 1), 250);
           return;
         }
-        eng.thresholds = eng.thresholds.map((t, i) =>
-          i <= 4 ? t : i === 5 ? 0.4 : i === 6 ? 0.3 : 32 / 2 ** i);
+        eng.thresholds = eng.thresholds.map(t => t * 5);
       })(40);
 
       // Day/night overlay — disabled for now
