@@ -743,46 +743,47 @@
     const REFRESH_INTERVAL_MS = 5 * 60_000; // re-fetch every 5 minutes
 
     // Last known position — used when live data is unavailable or on first load.
-    // Nuku Hiva, Marquesas — most recent YB satellite ping as of Apr 13 2026.
+    // Neiafu, Vava'u, Tonga — most recent YB satellite ping as of Jun 11 2026.
     const LAST_KNOWN = {
-      lat:     -8.94502,
-      lng:     -140.16394,
+      lat:     -18.663,
+      lng:     -173.9837,
       sog:     null,
       cog:     null,
-      updated: '13 Apr 2026 (YB satellite)',
+      updated: '11 Jun 2026 (YB satellite)',
       source:  'YB Tracking',
     };
 
     // ── Oyster World Rally 2026/27 planned waypoints ──────────────
-    // done: true = leg completed (as of Apr 15 2026)
+    // done: fallback only — recomputed from the GPS track by updateRouteProgress()
+    // tz: UTC offset (hours) at the waypoint, used for the local-time display
     const RALLY_ROUTE = [
-      { lat:  17.1,  lng:  -61.8,  name: 'Antigua',              date: 'Jan 17',     done: true,  flag: '🇦🇬', country: 'Antigua & Barbuda'  },
-      { lat:  10.4,  lng:  -75.5,  name: 'Cartagena',             date: 'Jan 25',     done: true,  flag: '🇨🇴', country: 'Colombia'            },
-      { lat:   9.1,  lng:  -79.7,  name: 'Panama Canal',          date: 'Feb 12',     done: true,  flag: '🇵🇦', country: 'Panama'             },
-      { lat:  -0.7,  lng:  -90.3,  name: 'Galapagos Islands',     date: 'Mar 4',      done: true,  flag: '🇪🇨', country: 'Ecuador'            },
-      { lat:  -9.8,  lng: -139.0,  name: 'Hiva Oa, Marquesas',    date: 'Apr 4',      done: true,  flag: '🇵🇫', country: 'French Polynesia'   },
-      { lat:  -8.9,  lng: -140.1,  name: 'Nuku Hiva, Marquesas',  date: 'Apr 11',     done: true,  flag: '🇵🇫', country: 'French Polynesia'   },
-      { lat: -15.0,  lng: -145.5,  name: 'Tuamotus',              date: 'Apr 20',     done: false, flag: '🇵🇫', country: 'French Polynesia'   },
-      { lat: -17.5,  lng: -149.6,  name: 'Tahiti',                date: 'May 1',      done: false, flag: '🇵🇫', country: 'French Polynesia'   },
-      { lat: -16.7,  lng: -151.4,  name: 'Raiatea',               date: 'May 28',     done: false, flag: '🇵🇫', country: 'French Polynesia'   },
-      { lat: -18.7,  lng: -174.0,  name: "Tonga (Vava'u)",        date: 'Jun 9',      done: false, flag: '🇹🇴', country: 'Tonga'              },
-      { lat: -16.8,  lng:  179.3,  name: 'Savusavu, Fiji',        date: 'Jun 19',     done: false, flag: '🇫🇯', country: 'Fiji'               },
-      { lat: -17.8,  lng:  177.4,  name: 'Nadi, Fiji',            date: 'Jul 4',      done: false, flag: '🇫🇯', country: 'Fiji'               },
-      { lat: -19.5,  lng:  169.3,  name: 'Tanna, Vanuatu',        date: 'Jul 26',     done: false, flag: '🇻🇺', country: 'Vanuatu'            },
-      { lat: -17.7,  lng:  168.3,  name: 'Port Vila, Vanuatu',    date: 'Aug 1',      done: false, flag: '🇻🇺', country: 'Vanuatu'            },
-      { lat: -21.1,  lng:  149.2,  name: 'Mackay, Australia',     date: 'Aug 11',     done: false, flag: '🇦🇺', country: 'Australia'          },
-      { lat: -16.9,  lng:  145.8,  name: 'Cairns, Australia',     date: 'Aug 28',     done: false, flag: '🇦🇺', country: 'Australia'          },
-      { lat: -12.5,  lng:  130.8,  name: 'Darwin, Australia',     date: 'Sep 14',     done: false, flag: '🇦🇺', country: 'Australia'          },
-      { lat:  -8.5,  lng:  115.2,  name: 'Indonesia',             date: 'Sep 21',     done: false, flag: '🇮🇩', country: 'Indonesia'          },
-      { lat: -12.2,  lng:   96.8,  name: 'Cocos (Keeling) Is.',   date: 'Oct 14',     done: false, flag: '🇨🇨', country: 'Cocos Islands (AU)' },
-      { lat: -20.2,  lng:   57.5,  name: 'Mauritius',             date: 'Oct 28',     done: false, flag: '🇲🇺', country: 'Mauritius'          },
-      { lat: -21.1,  lng:   55.5,  name: 'Réunion',               date: 'Nov 6',      done: false, flag: '🇫🇷', country: 'France (Réunion)'   },
-      { lat: -33.9,  lng:   18.4,  name: 'Cape Town',             date: 'Dec 1',      done: false, flag: '🇿🇦', country: 'South Africa'       },
-      { lat: -15.9,  lng:   -5.7,  name: 'St Helena',             date: 'Jan 2027',   done: false, flag: '🇸🇭', country: 'St Helena (UK)'     },
-      { lat:  -8.1,  lng:  -34.9,  name: 'Recife, Brazil',        date: 'Feb 2027',   done: false, flag: '🇧🇷', country: 'Brazil'             },
-      { lat:  -3.9,  lng:  -32.4,  name: 'Fernando de Noronha',   date: 'Feb 2027',   done: false, flag: '🇧🇷', country: 'Brazil'             },
-      { lat:  12.1,  lng:  -61.7,  name: 'Grenada',               date: 'Mar 2027',   done: false, flag: '🇬🇩', country: 'Grenada'            },
-      { lat:  17.1,  lng:  -61.8,  name: 'Antigua (Finish)',      date: 'Apr 1 2027', done: false, flag: '🇦🇬', country: 'Antigua & Barbuda'  },
+      { lat:  17.1,  lng:  -61.8,  name: 'Antigua',              date: 'Jan 17',     done: true,  tz:  -4,   flag: '🇦🇬', country: 'Antigua & Barbuda'  },
+      { lat:  10.4,  lng:  -75.5,  name: 'Cartagena',             date: 'Jan 25',     done: true,  tz:  -5,   flag: '🇨🇴', country: 'Colombia'            },
+      { lat:   9.1,  lng:  -79.7,  name: 'Panama Canal',          date: 'Feb 12',     done: true,  tz:  -5,   flag: '🇵🇦', country: 'Panama'             },
+      { lat:  -0.7,  lng:  -90.3,  name: 'Galapagos Islands',     date: 'Mar 4',      done: true,  tz:  -6,   flag: '🇪🇨', country: 'Ecuador'            },
+      { lat:  -9.8,  lng: -139.0,  name: 'Hiva Oa, Marquesas',    date: 'Apr 4',      done: true,  tz:  -9.5, flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat:  -8.9,  lng: -140.1,  name: 'Nuku Hiva, Marquesas',  date: 'Apr 11',     done: true,  tz:  -9.5, flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -15.0,  lng: -145.5,  name: 'Tuamotus',              date: 'Apr 20',     done: true,  tz: -10,   flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -17.5,  lng: -149.6,  name: 'Tahiti',                date: 'May 1',      done: true,  tz: -10,   flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -16.7,  lng: -151.4,  name: 'Raiatea',               date: 'May 28',     done: true,  tz: -10,   flag: '🇵🇫', country: 'French Polynesia'   },
+      { lat: -18.7,  lng: -174.0,  name: "Tonga (Vava'u)",        date: 'Jun 9',      done: true,  tz:  13,   flag: '🇹🇴', country: 'Tonga'              },
+      { lat: -16.8,  lng:  179.3,  name: 'Savusavu, Fiji',        date: 'Jun 19',     done: false, tz:  12,   flag: '🇫🇯', country: 'Fiji'               },
+      { lat: -17.8,  lng:  177.4,  name: 'Nadi, Fiji',            date: 'Jul 4',      done: false, tz:  12,   flag: '🇫🇯', country: 'Fiji'               },
+      { lat: -19.5,  lng:  169.3,  name: 'Tanna, Vanuatu',        date: 'Jul 26',     done: false, tz:  11,   flag: '🇻🇺', country: 'Vanuatu'            },
+      { lat: -17.7,  lng:  168.3,  name: 'Port Vila, Vanuatu',    date: 'Aug 1',      done: false, tz:  11,   flag: '🇻🇺', country: 'Vanuatu'            },
+      { lat: -21.1,  lng:  149.2,  name: 'Mackay, Australia',     date: 'Aug 11',     done: false, tz:  10,   flag: '🇦🇺', country: 'Australia'          },
+      { lat: -16.9,  lng:  145.8,  name: 'Cairns, Australia',     date: 'Aug 28',     done: false, tz:  10,   flag: '🇦🇺', country: 'Australia'          },
+      { lat: -12.5,  lng:  130.8,  name: 'Darwin, Australia',     date: 'Sep 14',     done: false, tz:   9.5, flag: '🇦🇺', country: 'Australia'          },
+      { lat:  -8.5,  lng:  115.2,  name: 'Indonesia',             date: 'Sep 21',     done: false, tz:   8,   flag: '🇮🇩', country: 'Indonesia'          },
+      { lat: -12.2,  lng:   96.8,  name: 'Cocos (Keeling) Is.',   date: 'Oct 14',     done: false, tz:   6.5, flag: '🇨🇨', country: 'Cocos Islands (AU)' },
+      { lat: -20.2,  lng:   57.5,  name: 'Mauritius',             date: 'Oct 28',     done: false, tz:   4,   flag: '🇲🇺', country: 'Mauritius'          },
+      { lat: -21.1,  lng:   55.5,  name: 'Réunion',               date: 'Nov 6',      done: false, tz:   4,   flag: '🇫🇷', country: 'France (Réunion)'   },
+      { lat: -33.9,  lng:   18.4,  name: 'Cape Town',             date: 'Dec 1',      done: false, tz:   2,   flag: '🇿🇦', country: 'South Africa'       },
+      { lat: -15.9,  lng:   -5.7,  name: 'St Helena',             date: 'Jan 2027',   done: false, tz:   0,   flag: '🇸🇭', country: 'St Helena (UK)'     },
+      { lat:  -8.1,  lng:  -34.9,  name: 'Recife, Brazil',        date: 'Feb 2027',   done: false, tz:  -3,   flag: '🇧🇷', country: 'Brazil'             },
+      { lat:  -3.9,  lng:  -32.4,  name: 'Fernando de Noronha',   date: 'Feb 2027',   done: false, tz:  -2,   flag: '🇧🇷', country: 'Brazil'             },
+      { lat:  12.1,  lng:  -61.7,  name: 'Grenada',               date: 'Mar 2027',   done: false, tz:  -4,   flag: '🇬🇩', country: 'Grenada'            },
+      { lat:  17.1,  lng:  -61.8,  name: 'Antigua (Finish)',      date: 'Apr 1 2027', done: false, tz:  -4,   flag: '🇦🇬', country: 'Antigua & Barbuda'  },
     ];
 
     // Approximate actual GPS track Galapagos → Marquesas
@@ -799,17 +800,50 @@
     ];
     // ─────────────────────────────────────────────────────────────
 
+    // A waypoint counts as reached once the boat has been within this distance
+    const PORT_RADIUS_KM = 60;
+
+    function haversineKm(lat1, lng1, lat2, lng2) {
+      const rad = Math.PI / 180;
+      const dLat = (lat2 - lat1) * rad;
+      const dLng = (lng2 - lng1) * rad;
+      const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+      return 2 * 6371 * Math.asin(Math.sqrt(a));
+    }
+
+    // Recompute waypoint done flags from the actual GPS track: walk the track
+    // chronologically and advance once the boat has been within PORT_RADIUS_KM
+    // of an upcoming waypoint. Looks up to 3 waypoints ahead so a skipped stop
+    // doesn't stall progress; the limited lookahead also stops the Antigua
+    // finish (same coords as the start) matching the January departure track.
+    function updateRouteProgress(track) {
+      if (!track || track.length === 0) return;
+      let reached = 0; // the rally has started, so the start line is reached
+      for (const [lat, lng] of track) {
+        for (let k = Math.min(reached + 3, RALLY_ROUTE.length - 1); k > reached; k--) {
+          if (haversineKm(lat, lng, RALLY_ROUTE[k].lat, RALLY_ROUTE[k].lng) <= PORT_RADIUS_KM) {
+            reached = k;
+            break;
+          }
+        }
+      }
+      RALLY_ROUTE.forEach((w, i) => w.done = i <= reached);
+    }
+
     // Parse the YB API response.
     // Response shape: { drawRanges: [...], positions: [{at, t, g, id}, ...] }
     //   t  = latitude, g = longitude, at = Unix timestamp (milliseconds)
     function parseResponse(json) {
       const positions = json.positions;
       if (!positions || positions.length === 0) throw new Error('No positions in YB response');
+      positions.sort((a, b) => a.at - b.at);
 
       // Build GPS track from Antigua rally start (Jan 17 2026) onwards only
       const rallyStart = new Date('2026-01-17').getTime();
       const rallyPositions = positions.filter(p => p.at >= rallyStart);
       liveTrack = (rallyPositions.length > 1 ? rallyPositions : positions).map(p => [p.t, p.g]);
+      updateRouteProgress(liveTrack);
 
       // Most recent position is the last entry
       const last = positions[positions.length - 1];
@@ -987,6 +1021,8 @@
         vessel = parseResponse(json);
         updatePanel();
         updateGlobe();
+        populateJourney();
+        updateLocalTime();
         setStatus('live');
       } catch (err) {
         console.warn('Position fetch failed:', err);
@@ -1175,13 +1211,25 @@
       const current = [...RALLY_ROUTE].reverse().find(w => w.done);
       const next    = RALLY_ROUTE.find(w => !w.done);
 
-      if (current) {
+      // Only show a port as "NOW" if the boat is actually still there;
+      // otherwise they're on passage to the next stop.
+      const inPort = current &&
+        haversineKm(vessel.lat, vessel.lng, current.lat, current.lng) <= PORT_RADIUS_KM;
+
+      if (inPort || (current && !next)) {
         setText('j-cur-flag',    current.flag);
         setText('j-cur-place',   current.name);
         setText('j-cur-country', current.country);
         setText('m-j-cur-flag',    current.flag);
         setText('m-j-cur-place',   current.name);
         setText('m-j-cur-country', current.country);
+      } else if (next) {
+        setText('j-cur-flag',    '🌊');
+        setText('j-cur-place',   'At sea');
+        setText('j-cur-country', `En route to ${next.name}`);
+        setText('m-j-cur-flag',    '🌊');
+        setText('m-j-cur-place',   'At sea');
+        setText('m-j-cur-country', `En route to ${next.name}`);
       }
       if (next) {
         setText('j-nxt-flag',    next.flag);
@@ -1225,12 +1273,24 @@
       setText('m-day-of-total', 'of ' + totalDays);
     }
 
+    // UTC offset at the vessel: the political timezone of the nearest of the
+    // last-reached / next waypoint. Longitude-derived time goes wrong around
+    // the date line (Tonga is UTC+13, not UTC−11:30).
+    function currentTzOffset() {
+      const last = [...RALLY_ROUTE].reverse().find(w => w.done);
+      const next = RALLY_ROUTE.find(w => !w.done);
+      const candidates = [last, next].filter(Boolean);
+      if (candidates.length === 0) return Math.round(vessel.lng / 15 * 2) / 2;
+      candidates.sort((a, b) =>
+        haversineKm(vessel.lat, vessel.lng, a.lat, a.lng) -
+        haversineKm(vessel.lat, vessel.lng, b.lat, b.lng));
+      return candidates[0].tz;
+    }
+
     function updateLocalTime() {
-      // Derive UTC offset from longitude (nearest 30-min zone)
-      const rawOffset  = vessel.lng / 15;
-      const utcOffset  = Math.round(rawOffset * 2) / 2;
+      const utcOffset  = currentTzOffset();
       const ukOffset   = getUKOffset();
-      const behindHrs  = ukOffset - utcOffset; // always positive sailing west
+      const diffFromUK = utcOffset - ukOffset; // + = ahead of UK
 
       // Current local time at vessel position
       // now.getTime() is already UTC ms — no timezone adjustment needed
@@ -1247,10 +1307,13 @@
       const offM     = (absOff % 1) * 60;
       const offLabel = `UTC${sign}${offH}${offM ? ':' + String(offM).padStart(2,'0') : ''}`;
 
-      // Format difference e.g. "10½h" or "10h"
-      const diffH    = Math.floor(behindHrs);
-      const diffHalf = (behindHrs % 1) !== 0;
-      const diffLabel = `${diffH}${diffHalf ? '½' : ''}h behind UK`;
+      // Format difference e.g. "10½h behind UK" or "12h ahead of UK"
+      const diffAbs  = Math.abs(diffFromUK);
+      const diffH    = Math.floor(diffAbs);
+      const diffHalf = (diffAbs % 1) !== 0;
+      const diffLabel = diffFromUK === 0
+        ? 'same time as UK'
+        : `${diffH}${diffHalf ? '½' : ''}h ${diffFromUK > 0 ? 'ahead of' : 'behind'} UK`;
 
       setText('j-local-time',   timeStr);
       setText('j-tz-info',      `${offLabel} · ${diffLabel}`);
