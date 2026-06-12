@@ -1036,8 +1036,46 @@
       return pts;
     }
 
-    function rallyCoords(filterFn) {
-      return RALLY_ROUTE.filter(filterFn).map(w => [w.lat, w.lng]);
+    // Sea routing — via points ([lat, lng]) inserted into the leg ARRIVING at
+    // the keyed waypoint, so dashed legs stay in water instead of cutting
+    // across land. Only future legs need entries; sailed legs are never
+    // drawn dashed again.
+    const SEA_VIAS = {
+      'Nadi, Fiji':         [[-17.05, 178.35], [-17.30, 177.15]],  // Bligh Water, north-about Viti Levu
+      'Darwin, Australia':  [[-13.40, 143.90], [-10.40, 142.20],   // inside the reef, Torres Strait,
+                             [-10.20, 136.50], [-10.90, 131.60]],  // Arafura Sea, around Cobourg Pen.
+      'Indonesia':          [[-11.90, 128.80], [-11.40, 124.60],   // Beagle Gulf out, south of Timor,
+                             [-9.70, 117.50]],                     // south of Sumba/Lombok to Bali
+    };
+
+    // Upcoming route as one path per leg, starting at the boat's live
+    // position so the active leg is drawn too. Alpha steps down each leg —
+    // the route fades with distance in time. Adjacent legs share endpoint
+    // alphas so the fade reads as continuous.
+    function buildUpcomingLegs() {
+      const upcoming = RALLY_ROUTE.filter(w => !w.done);
+      const alpha = i => Math.max(0.08, 0.8 * Math.pow(0.78, i));
+      const legs = [];
+      let prev = [vessel.lat, vessel.lng];
+      upcoming.forEach((w, i) => {
+        legs.push({
+          coords: [prev, ...(SEA_VIAS[w.name] || []), [w.lat, w.lng]],
+          style: 'upcoming',
+          colors: [
+            `rgba(255,255,255,${alpha(i).toFixed(3)})`,
+            `rgba(255,255,255,${alpha(i + 1).toFixed(3)})`,
+          ],
+        });
+        prev = [w.lat, w.lng];
+      });
+      return legs;
+    }
+
+    function buildPathsData() {
+      return [
+        ...buildUpcomingLegs(),
+        { coords: buildGpsTrack(), style: 'gps' },
+      ];
     }
 
     function buildPastLabel(w) {
@@ -1100,10 +1138,7 @@
         ])
         .ringsData([{ lat: vessel.lat, lng: vessel.lng }])
         .labelsData([])
-        .pathsData([
-          { coords: rallyCoords(w => !w.done), style: 'upcoming' },
-          { coords: buildGpsTrack(),           style: 'gps'      },
-        ]);
+        .pathsData(buildPathsData());
     }
 
     function setStatus(state) {
@@ -1260,16 +1295,13 @@
         .ringMaxRadius(3)
         .ringPropagationSpeed(1)
         .ringRepeatPeriod(1200)
-        // ── Two paths: upcoming rally legs (dashed) + actual GPS track (gold) ──
-        .pathsData([
-          { coords: rallyCoords(w => !w.done), style: 'upcoming' },
-          { coords: buildGpsTrack(),           style: 'gps'      },
-        ])
+        // ── Paths: upcoming rally legs (dashed, fading) + GPS track (gold) ──
+        .pathsData(buildPathsData())
         .pathPoints('coords')
         .pathPointLat(p => p[0])
         .pathPointLng(p => p[1])
         .pathColor(d => {
-          if (d.style === 'upcoming') return ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)'];
+          if (d.style === 'upcoming') return d.colors;
           return ['rgba(244,160,180,0.9)', 'rgba(244,160,180,0.1)'];  // GPS track
         })
         .pathStroke(d => d.style === 'gps' ? 1.4 : 0.7)
