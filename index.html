@@ -1041,11 +1041,18 @@
     // across land. Only future legs need entries; sailed legs are never
     // drawn dashed again.
     const SEA_VIAS = {
+      'Savusavu, Fiji':     [[-17.35, -179.65], [-17.05, 179.55]], // south of Taveuni, along Vanua
+                                                                   // Levu's south coast (not across
+                                                                   // the Natewa peninsula)
       'Nadi, Fiji':         [[-17.05, 178.35], [-17.30, 177.15]],  // Bligh Water, north-about Viti Levu
+      'Cairns, Australia':  [[-19.55, 148.35]],                    // offshore of Bowen / Cape Upstart
       'Darwin, Australia':  [[-13.40, 143.90], [-10.40, 142.20],   // inside the reef, Torres Strait,
                              [-10.20, 136.50], [-10.90, 131.60]],  // Arafura Sea, around Cobourg Pen.
       'Indonesia':          [[-11.90, 128.80], [-11.40, 124.60],   // Beagle Gulf out, south of Timor,
                              [-9.70, 117.50]],                     // south of Sumba/Lombok to Bali
+      'Cape Town':          [[-26.80, 44.50]],                     // south of Madagascar's cape
+      'Antigua (Finish)':   [[14.70, -61.35], [15.45, -61.65],     // leeward (west) of Martinique,
+                             [16.35, -62.00]],                     // Dominica and Guadeloupe
     };
 
     // Upcoming route as one path per leg, starting at the boat's live
